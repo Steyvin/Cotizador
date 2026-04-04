@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     @font-face { font-family: 'Allanis';        src: url('fonts/Allanis (DEMO).ttf'); }
     @font-face { font-family: 'Barcelony';       src: url('fonts/Barcelony.ttf'); }
@@ -862,6 +863,140 @@
     .card:nth-child(6) { animation: fadeInUp .45s .40s both; }
     .card:nth-child(7) { animation: fadeInUp .45s .47s both; }
 
+    /* ── LOGIN OVERLAY ──────────────────────────────── */
+    #login-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #050505;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity .4s, visibility .4s;
+    }
+    #login-overlay::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 44px 44px;
+      pointer-events: none;
+    }
+    #login-overlay.oculto {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    #login-box {
+      position: relative;
+      background: #0f0f0f;
+      border: 1px solid #252525;
+      border-radius: 16px;
+      padding: 48px 40px 40px;
+      width: min(400px, 90vw);
+      text-align: center;
+      box-shadow: 0 24px 80px rgba(0,0,0,.8);
+      animation: fadeInUp .5s .1s both;
+    }
+    .login-logo {
+      width: 160px;
+      margin: 0 auto 8px;
+      display: block;
+      filter: drop-shadow(0 0 14px rgba(255,255,255,.25));
+    }
+    .login-tagline {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: .68rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.3);
+      margin-bottom: 32px;
+    }
+    .login-field {
+      margin-bottom: 14px;
+    }
+    .login-field input {
+      width: 100%;
+      padding: 13px 16px;
+      background: #080808;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      color: #f0f0f0;
+      font-family: 'Exo 2', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 2px;
+      text-align: center;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .login-field input:focus {
+      border-color: rgba(255,255,255,.4);
+      box-shadow: 0 0 0 3px rgba(255,255,255,.05);
+    }
+    .login-field input::placeholder { letter-spacing: 1px; color: #333; }
+    .login-btn {
+      width: 100%;
+      padding: 13px;
+      background: #ffffff;
+      color: #000;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background .15s, transform .1s, box-shadow .15s;
+      box-shadow: 0 0 24px rgba(255,255,255,.12);
+    }
+    .login-btn:hover { background: #e8e8e8; transform: translateY(-1px); box-shadow: 0 0 36px rgba(255,255,255,.2); }
+    .login-btn:active { transform: scale(.97); }
+    .login-error {
+      margin-top: 14px;
+      font-size: .82rem;
+      color: #ff5555;
+      min-height: 1.2em;
+      letter-spacing: .2px;
+    }
+    @keyframes loginShake {
+      0%,100% { transform: translateX(0); }
+      20%     { transform: translateX(-8px); }
+      40%     { transform: translateX(8px); }
+      60%     { transform: translateX(-5px); }
+      80%     { transform: translateX(5px); }
+    }
+    .shake { animation: loginShake .4s ease; }
+
+    /* ── CAPTURA NEON ────────────────────────────────── */
+    .neon-capture-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .btn-capture {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 18px;
+      background: #111;
+      border: 1.5px solid #2a2a2a;
+      border-radius: 8px;
+      color: rgba(255,255,255,.7);
+      font-family: 'Exo 2', sans-serif;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s, border-color .15s, color .15s;
+    }
+    .btn-capture:hover { background: #1a1a1a; border-color: rgba(255,255,255,.35); color: #fff; }
+    .btn-capture svg  { flex-shrink: 0; }
+    .btn-capture-dl   { flex: 0 0 auto; }
+
     /* ── PRINT ────────────────────────────────────────── */
     @media print {
       .hero, .section-title, .section-sub, .card, .btn-row { display: none !important; }
@@ -872,6 +1007,21 @@
   </style>
 </head>
 <body>
+
+<!-- LOGIN -->
+<div id="login-overlay">
+  <div id="login-box">
+    <img src="Recursos/NEXUS.png" alt="Nexus LED" class="login-logo" />
+    <p class="login-tagline">Herramienta interna · Uso exclusivo</p>
+    <div class="login-field">
+      <input type="password" id="login-input" placeholder="Contraseña"
+             onkeydown="if(event.key==='Enter') loginCheck()"
+             autocomplete="current-password" />
+    </div>
+    <button class="login-btn" onclick="loginCheck()">Ingresar</button>
+    <p class="login-error" id="login-error"></p>
+  </div>
+</div>
 
 <!-- HERO -->
 <header class="hero">
@@ -1348,6 +1498,18 @@
       </div>
     </div>
 
+    <!-- CAPTURA -->
+    <div class="neon-capture-row">
+      <button class="btn-capture" onclick="copiarNeon(this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copiar imagen
+      </button>
+      <button class="btn-capture btn-capture-dl" onclick="descargarNeon()" title="Descargar PNG">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Descargar
+      </button>
+    </div>
+
     <!-- 4. TIPOGRAFIA -->
     <div class="card" style="margin-bottom:16px;">
       <div class="card-header">
@@ -1771,6 +1933,84 @@
     const msg   = encodeURIComponent(`Hola, quiero cotizar un Neon Flex de tamaño personalizado${texto ? ' con el texto: ' + texto : ''}.`);
     window.open(`https://wa.me/${WHATSAPP_NUM}?text=${msg}`, '_blank');
   }
+
+  /* ══════════════ CAPTURA NEON ══════════════ */
+  function _capturarCanvas() {
+    const box = document.getElementById('neon-bg');
+    return html2canvas(box, {
+      backgroundColor: box.style.background || '#0a0a0a',
+      scale: 2,
+      useCORS: true,
+      logging: false,
+    });
+  }
+
+  async function copiarNeon(btn) {
+    const original = btn.innerHTML;
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Capturando…';
+    btn.disabled = true;
+    try {
+      const canvas = await _capturarCanvas();
+      canvas.toBlob(async blob => {
+        try {
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+          btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> ¡Copiada!';
+          setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 2200);
+        } catch {
+          // fallback: descargar si el clipboard falla (ej: HTTP local)
+          _descargarBlob(canvas);
+          btn.innerHTML = original;
+          btn.disabled = false;
+        }
+      }, 'image/png');
+    } catch {
+      btn.innerHTML = original;
+      btn.disabled = false;
+    }
+  }
+
+  function _descargarBlob(canvas) {
+    const texto = (document.getElementById('neon-input').value.trim() || 'neon').replace(/\s+/g, '-').slice(0, 30);
+    const link  = document.createElement('a');
+    link.download = `nexus-neon-${texto}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }
+
+  async function descargarNeon() {
+    const canvas = await _capturarCanvas();
+    _descargarBlob(canvas);
+  }
+
+  /* ══════════════ LOGIN ══════════════ */
+  // ── Para cambiar la contraseña: reemplaza el valor de _PW ──
+  const _PW = btoa('nexus2025');
+
+  function loginCheck() {
+    const input = document.getElementById('login-input');
+    const err   = document.getElementById('login-error');
+    if (btoa(input.value) === _PW) {
+      sessionStorage.setItem('nx_auth', _PW);
+      document.getElementById('login-overlay').classList.add('oculto');
+      input.value = '';
+      err.textContent = '';
+    } else {
+      err.textContent = 'Contraseña incorrecta';
+      document.getElementById('login-box').classList.add('shake');
+      input.value = '';
+      input.focus();
+      setTimeout(() => document.getElementById('login-box').classList.remove('shake'), 450);
+    }
+  }
+
+  // Verificar sesión al cargar
+  (function initAuth() {
+    if (sessionStorage.getItem('nx_auth') === _PW) {
+      document.getElementById('login-overlay').classList.add('oculto');
+    } else {
+      document.getElementById('login-input').focus();
+    }
+  })();
 </script>
 <footer class="nx-footer">
   <img src="Recursos/NEXUS.png" alt="Nexus LED" class="footer-logo" />
