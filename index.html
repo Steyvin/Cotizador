@@ -1059,6 +1059,133 @@
     }
     .btn-modal-cancel:hover { border-color: #444; color: rgba(255,255,255,.7); }
 
+    /* ── VISTA PEDIDOS ──────────────────────────────── */
+    #view-pedidos { padding-top: 56px; min-height: 100vh; }
+
+    /* Botón convertir en pedido en tarjeta cotización */
+    .cot-btn-pedido {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px;
+      background: #0f1a0f;
+      border: 1px solid #1e3a1e;
+      color: #6ee7b7;
+      border-radius: 6px;
+      font-size: .82rem; font-weight: 600; font-family: 'Exo 2', sans-serif;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+    }
+    .cot-btn-pedido:hover { background: #142014; border-color: rgba(110,231,183,.4); }
+    .cot-btn-pedido.ya-pedido {
+      background: transparent; border-color: #1e1e1e;
+      color: #444; cursor: default;
+    }
+
+    /* Tarjeta de pedido */
+    .pedido-card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .pedido-card:hover { border-color: #2e2e2e; box-shadow: 0 4px 28px rgba(0,0,0,.5); }
+    .pedido-card-top {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+    }
+    @media (max-width: 640px) { .pedido-card-top { grid-template-columns: 1fr; } }
+    .pedido-card-img {
+      background: #0a0a0a;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 160px; overflow: hidden;
+      border-right: 1px solid #1a1a1a;
+    }
+    .pedido-card-img img { width: 100%; height: 100%; object-fit: cover; }
+    .pedido-card-img .no-img { font-size: .75rem; color: #333; }
+    @media (max-width: 640px) {
+      .pedido-card-img { border-right: none; border-bottom: 1px solid #1a1a1a; min-height: 130px; }
+    }
+    .pedido-card-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 6px; }
+    .pedido-card-top-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .pedido-estado-badge {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: .7rem; font-weight: 700; letter-spacing: .8px;
+      text-transform: uppercase; padding: 3px 10px;
+      border-radius: 50px; border: 1px solid; white-space: nowrap;
+    }
+    /* colores por estado */
+    .estado-0 { color: #94a3b8; border-color: #1e2a38; background: #0c1520; }
+    .estado-1 { color: #fbbf24; border-color: #3a2e00; background: #1a1500; }
+    .estado-2 { color: #fb923c; border-color: #3a1e00; background: #1a0e00; }
+    .estado-3 { color: #818cf8; border-color: #252050; background: #100e28; }
+    .estado-4 { color: #4ade80; border-color: #0f3020; background: #071810; }
+    .estado-5 { color: #86efac; border-color: #1a4028; background: #0a2015; box-shadow: 0 0 10px rgba(134,239,172,.1); }
+
+    /* Stepper de estados */
+    .pedido-stepper {
+      border-top: 1px solid #1a1a1a;
+      padding: 16px 20px 18px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .stepper-track {
+      display: flex;
+      align-items: flex-start;
+      min-width: 540px;
+    }
+    .step-item {
+      display: flex; flex-direction: column; align-items: center;
+      cursor: pointer; flex: 1;
+      position: relative;
+    }
+    .step-item::after {
+      content: '';
+      position: absolute;
+      top: 11px; left: 50%; right: -50%;
+      height: 2px;
+      background: #1e1e1e;
+      z-index: 0;
+    }
+    .step-item:last-child::after { display: none; }
+    .step-item.done::after  { background: rgba(255,255,255,.18); }
+    .step-dot {
+      width: 24px; height: 24px; border-radius: 50%;
+      border: 2px solid #2a2a2a;
+      background: #0d0d0d;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .6rem; color: transparent;
+      position: relative; z-index: 1;
+      transition: border-color .2s, background .2s, box-shadow .2s;
+    }
+    .step-item.done  .step-dot { border-color: rgba(255,255,255,.3); background: rgba(255,255,255,.08); color: rgba(255,255,255,.5); font-size: .55rem; }
+    .step-item.active .step-dot { border-color: #fff; background: #fff; color: #000; font-weight: 900; font-size: .65rem; box-shadow: 0 0 10px rgba(255,255,255,.3); }
+    .step-item:hover:not(.active) .step-dot { border-color: #555; }
+    .step-label {
+      font-size: .62rem; color: #3a3a3a; text-align: center;
+      margin-top: 7px; line-height: 1.3; max-width: 72px;
+      transition: color .2s;
+    }
+    .step-item.done  .step-label  { color: rgba(255,255,255,.35); }
+    .step-item.active .step-label { color: #fff; font-weight: 600; }
+    .step-item:hover:not(.active) .step-label { color: #666; }
+
+    .pedido-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    .pedido-btn-wa  { /* reusar .cot-btn-wa */ }
+    .pedido-btn-del {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px;
+      background: transparent; border: 1px solid #2a1a1a;
+      color: rgba(255,100,100,.5); border-radius: 6px;
+      font-size: .82rem; font-weight: 600; font-family: 'Exo 2', sans-serif;
+      cursor: pointer; transition: background .15s, color .15s, border-color .15s;
+    }
+    .pedido-btn-del:hover { background: #1a0808; border-color: rgba(255,80,80,.4); color: #ff6464; }
+
+    /* Empty pedidos */
+    .ped-empty { text-align: center; padding: 80px 24px; color: var(--muted); }
+    .ped-empty-icon { font-size: 3rem; margin-bottom: 16px; opacity: .35; }
+
     /* ── VISTA COTIZACIONES ──────────────────────────── */
     #view-cotizaciones { padding-top: 56px; min-height: 100vh; }
     .cot-empty {
@@ -1334,6 +1461,11 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
         Cotizaciones
         <span class="nav-badge" id="nav-badge" style="display:none">0</span>
+      </button>
+      <button class="nav-tab" id="tab-pedidos" onclick="showView('pedidos')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        Pedidos
+        <span class="nav-badge" id="pedidos-badge" style="display:none">0</span>
       </button>
     </div>
   </div>
@@ -2337,14 +2469,16 @@
     }
   })();
 
-  /* ══════════════ NAVEGACIÓN VISTAS ══════════��═══ */
+  /* ══════════════ NAVEGACIÓN VISTAS ══════════════ */
   function showView(view) {
-    const esCot = view === 'cotizaciones';
-    document.getElementById('view-cotizador').style.display    = esCot ? 'none' : '';
-    document.getElementById('view-cotizaciones').style.display = esCot ? ''     : 'none';
-    document.getElementById('tab-cotizador').classList.toggle('active',    !esCot);
-    document.getElementById('tab-cotizaciones').classList.toggle('active', esCot);
-    if (esCot) renderCotizaciones();
+    ['cotizador','cotizaciones','pedidos'].forEach(v => {
+      const el = document.getElementById('view-' + v);
+      if (el) el.style.display = v === view ? '' : 'none';
+      const tab = document.getElementById('tab-' + v);
+      if (tab) tab.classList.toggle('active', v === view);
+    });
+    if (view === 'cotizaciones') renderCotizaciones();
+    if (view === 'pedidos')      renderPedidos();
   }
 
   /* ══════════════ MODAL GUARDAR ══════════════ */
@@ -2471,6 +2605,16 @@
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.523 5.847L0 24l6.335-1.499A11.934 11.934 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.891 0-3.659-.5-5.188-1.373l-.371-.22-3.762.89.938-3.65-.242-.381A9.96 9.96 0 0 1 2 12C2 6.478 6.478 2 12 2s10 4.478 10 10-4.478 10-10 10z"/></svg>
                 WhatsApp
               </button>` : ''}
+            ${(function(){
+              const pedidos = JSON.parse(localStorage.getItem('nx_pedidos') || '[]');
+              const yaConv  = pedidos.some(p => p.cotizacionId === q.id);
+              return yaConv
+                ? `<button class="cot-btn-pedido ya-pedido" disabled>✓ En pedidos</button>`
+                : `<button class="cot-btn-pedido" onclick="convertirEnPedido(${q.id})">
+                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                     Convertir en pedido
+                   </button>`;
+            })()}
             <button class="cot-btn-del" onclick="eliminarCotizacion(${q.id})">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
               Eliminar
@@ -2513,8 +2657,137 @@
     return String(s).replace(/'/g,"\\'");
   }
 
-  // Inicializar badge al cargar
+  // Inicializar badges al cargar
   actualizarBadge();
+  actualizarBadgePedidos();
+
+  /* ══════════════ PEDIDOS ══════════════ */
+  const ESTADOS = [
+    'Pedido realizado',
+    'En proceso',
+    'Enviado a proveedor',
+    'En fabricación',
+    'Terminado',
+    'Entregado'
+  ];
+
+  function convertirEnPedido(cotizacionId) {
+    const cotizaciones = JSON.parse(localStorage.getItem('nx_cotizaciones') || '[]');
+    const cot = cotizaciones.find(c => c.id === cotizacionId);
+    if (!cot) return;
+
+    const pedido = {
+      id:            Date.now(),
+      cotizacionId:  cotizacionId,
+      fechaPedido:   new Date().toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' }),
+      cliente:       cot.cliente,
+      contacto:      cot.contacto,
+      descripcion:   cot.descripcion,
+      precio:        cot.precio,
+      imagen:        cot.imagen,
+      tipo:          cot.tipo,
+      estado:        ESTADOS[0]
+    };
+
+    const pedidos = JSON.parse(localStorage.getItem('nx_pedidos') || '[]');
+    pedidos.unshift(pedido);
+    localStorage.setItem('nx_pedidos', JSON.stringify(pedidos));
+
+    actualizarBadgePedidos();
+    renderCotizaciones(); // refrescar para mostrar "✓ En pedidos"
+
+    // Ir directo a la vista de pedidos
+    showView('pedidos');
+  }
+
+  function renderPedidos() {
+    const pedidos = JSON.parse(localStorage.getItem('nx_pedidos') || '[]');
+    const lista   = document.getElementById('ped-lista');
+    const empty   = document.getElementById('ped-empty');
+
+    if (!pedidos.length) {
+      lista.innerHTML      = '';
+      empty.style.display  = '';
+      return;
+    }
+    empty.style.display = 'none';
+
+    lista.innerHTML = pedidos.map(p => {
+      const idxActivo = ESTADOS.indexOf(p.estado);
+
+      const steps = ESTADOS.map((e, i) => {
+        const cls = i < idxActivo ? 'done' : i === idxActivo ? 'active' : '';
+        const dot  = i < idxActivo ? '✓' : i === idxActivo ? '●' : '';
+        return `
+          <div class="step-item ${cls}" onclick="actualizarEstado(${p.id},'${escAttr(e)}')" title="${e}">
+            <div class="step-dot">${dot}</div>
+            <div class="step-label">${e}</div>
+          </div>`;
+      }).join('');
+
+      return `
+        <div class="pedido-card" id="ped-${p.id}">
+          <div class="pedido-card-top">
+            <div class="pedido-card-img">
+              ${p.imagen
+                ? `<img src="${p.imagen}" alt="preview" />`
+                : `<span class="no-img">Sin imagen</span>`}
+            </div>
+            <div class="pedido-card-body">
+              <div class="pedido-card-top-row">
+                <span class="cot-badge cot-badge-${p.tipo}">${TIPO_LABEL[p.tipo] || p.tipo}</span>
+                <span class="pedido-estado-badge estado-${idxActivo}">${p.estado}</span>
+                <span class="cot-fecha">${p.fechaPedido}</span>
+              </div>
+              <div class="cot-cliente">${escHtml(p.cliente)}</div>
+              ${p.contacto ? `<div class="cot-contacto">📱 ${escHtml(p.contacto)}</div>` : ''}
+              ${p.descripcion ? `<div class="cot-desc">${escHtml(p.descripcion)}</div>` : ''}
+              <div class="cot-precio">${fmt(p.precio)}</div>
+              <div class="pedido-actions">
+                ${p.contacto ? `
+                  <button class="cot-btn-wa" onclick="contactarCliente('${escAttr(p.contacto)}','${escAttr(p.cliente)}')">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.523 5.847L0 24l6.335-1.499A11.934 11.934 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.891 0-3.659-.5-5.188-1.373l-.371-.22-3.762.89.938-3.65-.242-.381A9.96 9.96 0 0 1 2 12C2 6.478 6.478 2 12 2s10 4.478 10 10-4.478 10-10 10z"/></svg>
+                    WhatsApp
+                  </button>` : ''}
+                <button class="pedido-btn-del" onclick="eliminarPedido(${p.id})">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="pedido-stepper">
+            <div class="stepper-track">${steps}</div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function actualizarEstado(pedidoId, nuevoEstado) {
+    const pedidos = JSON.parse(localStorage.getItem('nx_pedidos') || '[]');
+    const idx     = pedidos.findIndex(p => p.id === pedidoId);
+    if (idx === -1) return;
+    pedidos[idx].estado = nuevoEstado;
+    localStorage.setItem('nx_pedidos', JSON.stringify(pedidos));
+    renderPedidos();
+  }
+
+  function eliminarPedido(id) {
+    if (!confirm('¿Eliminar este pedido?')) return;
+    let pedidos = JSON.parse(localStorage.getItem('nx_pedidos') || '[]');
+    pedidos = pedidos.filter(p => p.id !== id);
+    localStorage.setItem('nx_pedidos', JSON.stringify(pedidos));
+    actualizarBadgePedidos();
+    renderPedidos();
+  }
+
+  function actualizarBadgePedidos() {
+    const pedidos = JSON.parse(localStorage.getItem('nx_pedidos') || '[]');
+    const badge   = document.getElementById('pedidos-badge');
+    if (!badge) return;
+    badge.textContent   = pedidos.length;
+    badge.style.display = pedidos.length ? '' : 'none';
+  }
 </script>
 <footer class="nx-footer">
   <img src="Recursos/NEXUS.png" alt="Nexus LED" class="footer-logo" />
@@ -2541,6 +2814,24 @@
       <div class="cot-empty-icon">📋</div>
       <p>No hay cotizaciones guardadas aún.</p>
       <p class="cot-empty-sub">Usa el botón "Guardar cotización" en el cotizador.</p>
+    </div>
+  </div>
+</div>
+
+<!-- VISTA: PEDIDOS -->
+<div id="view-pedidos" style="display:none;">
+  <div class="container">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:32px;">
+      <div>
+        <h2 class="section-title">Pedidos</h2>
+        <p class="section-sub" style="margin-bottom:0;">Seguimiento de estado por pedido</p>
+      </div>
+    </div>
+    <div id="ped-lista"></div>
+    <div id="ped-empty" class="ped-empty" style="display:none;">
+      <div class="ped-empty-icon">📦</div>
+      <p>No hay pedidos aún.</p>
+      <p class="cot-empty-sub">Convierte una cotización en pedido desde la pestaña Cotizaciones.</p>
     </div>
   </div>
 </div>
