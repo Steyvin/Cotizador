@@ -1,6 +1,6 @@
 # Nexus LED — Cotizador de Avisos
 
-Herramienta interna de cotización para el negocio **Nexus LED**. Permite calcular al instante el precio de avisos en acrílico iluminado y Neon Flex, con una vista de precio para el cliente y un desglose interno de costos.
+Herramienta interna de cotización para el negocio **Nexus LED**. Permite calcular el precio de avisos en acrílico iluminado y Neon Flex, guardar cotizaciones con datos del cliente, y consultarlas en cualquier momento.
 
 ---
 
@@ -16,6 +16,19 @@ La herramienta está protegida con contraseña. Al abrir la página se muestra u
   y reemplaza `nexus2025` por la contraseña nueva.
 
 La sesión dura mientras el navegador esté abierto (sessionStorage). Al cerrar el navegador se requiere ingresar la contraseña de nuevo.
+
+---
+
+## Navegación
+
+La aplicación tiene dos vistas accesibles desde la barra de navegación fija en la parte superior:
+
+| Vista | Descripción |
+|---|---|
+| **Cotizador** | Calculadora de precios para acrílico y Neon Flex |
+| **Mis Cotizaciones** | Historial de cotizaciones guardadas con datos del cliente |
+
+La pestaña "Mis Cotizaciones" muestra un badge con el número de cotizaciones guardadas.
 
 ---
 
@@ -133,7 +146,36 @@ Dos botones debajo del preview:
 - **Copiar imagen** — captura el preview y lo copia al portapapeles (requiere HTTPS o Chrome)
 - **Descargar** — descarga el preview como archivo `.png` a doble resolución (2×)
 
-Útil para enviarle la visualización al cliente antes de fabricar.
+---
+
+## Guardar cotizaciones
+
+Al terminar de calcular, el botón **"Guardar cotización"** (disponible en acrílico y Neon Flex) abre un formulario con:
+
+| Campo | Descripción |
+|---|---|
+| Vista previa | Captura automática del cotizador (precio del acrílico o preview del Neon) |
+| Subir imagen | Permite subir una foto del aviso desde el PC (reemplaza la captura automática) |
+| Nombre del cliente | Nombre para identificar la cotización |
+| Contacto | WhatsApp o teléfono del cliente |
+| Descripción | Detalle libre de lo que se cotizó |
+
+Los datos se guardan en el navegador con **localStorage** — persisten aunque se cierre y vuelva a abrir la página.
+
+---
+
+## Mis Cotizaciones
+
+Vista accesible desde la barra de navegación. Muestra todas las cotizaciones guardadas como tarjetas con:
+
+- Imagen del aviso cotizado
+- Tipo de aviso (Nube / Letra a letra / Neon Flex)
+- Fecha de guardado
+- Nombre y contacto del cliente
+- Descripción
+- Precio cotizado
+- Botón **WhatsApp** — abre WhatsApp con el número del cliente
+- Botón **Eliminar** — elimina la cotización con confirmación
 
 ---
 
@@ -143,7 +185,9 @@ Dos botones debajo del preview:
 - **Fuentes:** Rajdhani (títulos y botones) + Exo 2 (cuerpo) vía Google Fonts
 - **Tema:** Negro/blanco — fondo `#080808`, tarjetas `#111111`, texto `#f0f0f0`
 - **Animaciones CSS:** entrada del logo, scanline en el hero, aparición escalonada de elementos, pulso del logo
-- **html2canvas** (CDN) para la captura del preview Neon Flex
+- **html2canvas** (CDN) para captura de imagen del cotizador
+- **localStorage** para persistencia de cotizaciones guardadas
+- **sessionStorage** para mantener la sesión del login
 - **Responsive:** adaptado para móvil desde 320px
 
 ---
@@ -153,6 +197,7 @@ Dos botones debajo del preview:
 ```
 /
 ├── index.html              # Aplicación completa
+├── README.md               # Esta documentación
 ├── Recursos/
 │   ├── NEXUS.png           # Logo blanco con fondo transparente
 │   ├── NEXUS.ico           # Favicon
