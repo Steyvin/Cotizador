@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexus LED — Cotizador de Avisos</title>
+  <link rel="icon" type="image/x-icon" href="Recursos/NEXUS.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <style>
+    @font-face { font-family: 'Allanis';        src: url('fonts/Allanis (DEMO).ttf'); }
+    @font-face { font-family: 'Barcelony';       src: url('fonts/Barcelony.ttf'); }
+    @font-face { font-family: 'Barokah';         src: url('fonts/Barokah Signature by Alifinart Studio.ttf'); }
+    @font-face { font-family: 'Cosmopolitan';    src: url('fonts/CosmopolitanScriptRegular.otf'); }
+    @font-face { font-family: 'Elegant';         src: url('fonts/Elegant DEMO.ttf'); }
+    @font-face { font-family: 'HanleyPro';       src: url('fonts/HanleyPro-Monoline.ttf'); }
+    @font-face { font-family: 'Hattinand';       src: url('fonts/Hattinand.otf'); }
+    @font-face { font-family: 'Sacramento';      src: url('fonts/Sacramento-Regular.ttf'); }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── ANIMATIONS ─────────────────────────────────── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes logoReveal {
+      0%   { opacity: 0; transform: scale(.88); filter: drop-shadow(0 0 0px rgba(255,255,255,0)); }
+      60%  { opacity: 1; transform: scale(1.03); filter: drop-shadow(0 0 24px rgba(255,255,255,.55)); }
+      100% { transform: scale(1); filter: drop-shadow(0 0 14px rgba(255,255,255,.3)); }
+    }
+    @keyframes glowPulse {
+      0%, 100% { filter: drop-shadow(0 0 12px rgba(255,255,255,.2)); }
+      50%       { filter: drop-shadow(0 0 22px rgba(255,255,255,.45)); }
+    }
+    @keyframes scanline {
+      0%   { transform: translateY(-100%); opacity: .04; }
+      100% { transform: translateY(100vh); opacity: 0; }
+    }
+    @keyframes borderFlash {
+      0%,100% { border-color: var(--border); }
+      50%      { border-color: rgba(255,255,255,.35); }
+    }
+    @keyframes countIn {
+      from { transform: scale(.85); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+
+    :root {
+      --brand:      #ffffff;
+      --brand-dark: #e0e0e0;
+      --bg:         #080808;
+      --card:       #111111;
+      --border:     #252525;
+      --text:       #f0f0f0;
+      --muted:      #777777;
+      --success:    #6ee7b7;
+      --radius:     12px;
+      --nx-black:   #050505;
+      --nx-glow:    rgba(255,255,255,.85);
+    }
+
+    body {
+      font-family: 'Exo 2', 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── HERO ─────────────────────────────────────────── */
+    .hero {
+      background: var(--nx-black);
+      color: #fff;
+      text-align: center;
+      padding: 64px 24px 72px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* cuadrícula de circuito en el fondo */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 44px 44px;
+      pointer-events: none;
+    }
+    /* scanline effect */
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 120px;
+      background: linear-gradient(to bottom, transparent, rgba(255,255,255,.025), transparent);
+      animation: scanline 7s linear infinite;
+      pointer-events: none;
+    }
+    .hero-logo {
+      width: min(300px, 72vw);
+      margin: 0 auto 32px;
+      display: block;
+      animation: logoReveal .9s cubic-bezier(.22,.68,0,1.2) both, glowPulse 4s ease-in-out 1s infinite;
+    }
+    .hero-tagline {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.55);
+      margin-bottom: 12px;
+      animation: fadeInUp .6s .35s both;
+    }
+    .hero h1 {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: clamp(1.9rem, 5vw, 3rem);
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      color: #fff;
+      animation: fadeInUp .6s .5s both;
+    }
+    .hero p {
+      font-size: .97rem;
+      color: rgba(255,255,255,.5);
+      max-width: 460px;
+      margin: 0 auto 32px;
+      line-height: 1.7;
+      font-weight: 300;
+      animation: fadeInUp .6s .65s both;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+      animation: fadeInUp .6s .8s both;
+    }
+    .btn-hero {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #ffffff;
+      color: #000;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: .6px;
+      padding: 13px 34px;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: transform .15s, box-shadow .15s, background .15s;
+      box-shadow: 0 0 28px rgba(255,255,255,.2);
+    }
+    .btn-hero:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 44px rgba(255,255,255,.35);
+      background: #f0f0f0;
+    }
+    .btn-hero-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      letter-spacing: .5px;
+      padding: 12px 28px;
+      border-radius: 4px;
+      text-decoration: none;
+      border: 1.5px solid rgba(255,255,255,.25);
+      transition: border-color .15s, background .15s;
+    }
+    .btn-hero-outline:hover { border-color: rgba(255,255,255,.7); background: rgba(255,255,255,.06); }
+    .hero-instagram {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: rgba(255,255,255,.38);
+      font-size: .8rem;
+      text-decoration: none;
+      transition: color .15s;
+      animation: fadeInUp .6s .95s both;
+    }
+    .hero-instagram:hover { color: rgba(255,255,255,.8); }
+    .hero-instagram svg { width:15px; height:15px; fill:currentColor; flex-shrink:0; }
+    /* divisor inferior del hero */
+    .hero-divider {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+    }
+
+    /* ── LAYOUT ───────────────────────────────────────── */
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 52px 20px 72px;
+    }
+    .section-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: .5px;
+      margin-bottom: 6px;
+    }
+    .section-sub {
+      color: var(--muted);
+      margin-bottom: 36px;
+      font-size: .93rem;
+      font-weight: 300;
+    }
+
+    /* ── CARD ─────────────────────────────────────────── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 28px 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 16px rgba(0,0,0,.35);
+      transition: border-color .25s, box-shadow .25s;
+    }
+    .card:hover {
+      border-color: #333333;
+      box-shadow: 0 4px 28px rgba(0,0,0,.5);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .card-icon {
+      width: 38px; height: 38px;
+      border-radius: 8px;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.15rem;
+      flex-shrink: 0;
+    }
+    .card-title { font-size: .97rem; font-weight: 700; letter-spacing: .2px; }
+    .card-desc  { font-size: .8rem; color: var(--muted); font-weight: 300; }
+
+    /* ── FORM ELEMENTS ────────────────────────────────── */
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 560px) { .field-row { grid-template-columns: 1fr; } }
+
+    label {
+      display: block;
+      font-size: .83rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: rgba(255,255,255,.7);
+      letter-spacing: .2px;
+    }
+    .field { margin-bottom: 16px; }
+    .field:last-child { margin-bottom: 0; }
+
+    input[type="number"], input[type="text"] {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: .95rem;
+      font-family: 'Exo 2', sans-serif;
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+      background: #0d0d0d;
+      color: var(--text);
+    }
+    input[type="number"]:focus, input[type="text"]:focus {
+      border-color: rgba(255,255,255,.5);
+      box-shadow: 0 0 0 3px rgba(255,255,255,.06);
+      background: #141414;
+    }
+    input::placeholder { color: #444; }
+    .input-hint {
+      font-size: .77rem;
+      color: var(--muted);
+      margin-top: 4px;
+      font-weight: 300;
+    }
+
+    /* toggle switch */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .toggle-label { font-size: .9rem; font-weight: 600; }
+    .toggle-desc  { font-size: .8rem; color: var(--muted); font-weight: 300; }
+    .switch { position: relative; display: inline-block; width: 48px; height: 26px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; inset: 0;
+      background: #2a2a2a;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: background .2s;
+      border: 1px solid #333;
+    }
+    .slider::before {
+      content: '';
+      position: absolute;
+      width: 20px; height: 20px;
+      left: 2px; top: 2px;
+      background: #666;
+      border-radius: 50%;
+      transition: transform .2s, background .2s;
+    }
+    .switch input:checked + .slider { background: #1a1a1a; border-color: rgba(255,255,255,.4); }
+    .switch input:checked + .slider::before { transform: translateX(22px); background: #ffffff; }
+
+    /* extra panel */
+    .extra-panel {
+      margin-top: 14px;
+      padding: 14px 16px;
+      background: #0d0d0d;
+      border-radius: 8px;
+      border: 1px solid #252525;
+      display: none;
+    }
+    .extra-panel.visible { display: block; }
+
+    /* ── RESUMEN ──────────────────────────────────────── */
+    #resumen {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.5);
+    }
+    #resumen h2 {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--brand-dark);
+      letter-spacing: .5px;
+    }
+    .resumen-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: .9rem;
+    }
+    .resumen-item:last-of-type { border-bottom: none; }
+    .resumen-item .nombre { color: var(--muted); }
+    .resumen-item .valor  { font-weight: 600; }
+    .resumen-item.zero    { opacity: .3; }
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,.2);
+    }
+    .total-row .label { font-size: 1rem; font-weight: 700; }
+    .total-row .monto {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--brand);
+    }
+
+    /* ── BOTONES ──────────────────────────────────────── */
+    .btn-row { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+    .btn {
+      flex: 1;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-size: .9rem;
+      font-family: 'Exo 2', sans-serif;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: opacity .15s, transform .1s, box-shadow .15s;
+      letter-spacing: .3px;
+    }
+    .btn:hover { opacity: .88; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,.4); }
+    .btn:active { transform: scale(.97); }
+    .btn-primary { background: #ffffff; color: #000; }
+    .btn-outline  {
+      background: transparent;
+      color: rgba(255,255,255,.7);
+      border: 1.5px solid #333;
+    }
+    .btn-outline:hover { border-color: rgba(255,255,255,.4); color: #fff; }
+
+    /* ── APLIQUES ─────────────────────────────────────── */
+    .aplique-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      align-items: end;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px dashed #1e1e1e;
+    }
+    .aplique-row:first-child { border-top: none; margin-top: 6px; }
+    @media (max-width: 560px) { .aplique-row { grid-template-columns: 1fr 1fr; } }
+    .aplique-num {
+      grid-column: 1 / -1;
+      font-size: .75rem;
+      font-weight: 700;
+      color: rgba(255,255,255,.5);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin-bottom: -4px;
+    }
+    select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: .9rem;
+      font-family: 'Exo 2', sans-serif;
+      background: #0d0d0d;
+      color: var(--text);
+      outline: none;
+      cursor: pointer;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    select:focus {
+      border-color: rgba(255,255,255,.4);
+      box-shadow: 0 0 0 3px rgba(255,255,255,.05);
+    }
+    select option { background: #111; color: #f0f0f0; }
+    .aplique-subtotal { display: none; }
+
+    /* ── TIPO SELECTOR ───────────────────────────────── */
+    .tipo-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 480px) { .tipo-selector { grid-template-columns: 1fr; } }
+    .tipo-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 18px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      background: #0d0d0d;
+      cursor: pointer;
+      transition: border-color .2s, background .2s, box-shadow .2s;
+      text-align: center;
+    }
+    .tipo-btn:hover { border-color: #444; background: #141414; }
+    .tipo-btn.active {
+      border-color: rgba(255,255,255,.5);
+      background: #161616;
+      box-shadow: 0 0 0 3px rgba(255,255,255,.05), 0 0 18px rgba(255,255,255,.06);
+    }
+    .tipo-icon  { font-size: 1.7rem; line-height: 1; }
+    .tipo-nombre {
+      font-size: .93rem;
+      font-weight: 700;
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      letter-spacing: .3px;
+    }
+    .tipo-hint  { font-size: .72rem; color: var(--muted); font-weight: 300; }
+
+    /* ── INFO GRID (nube auto) ────────────────────────── */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 480px) { .info-grid { grid-template-columns: 1fr 1fr; } }
+    .info-item {
+      background: #0d0d0d;
+      border: 1px solid #1e1e1e;
+      border-radius: 8px;
+      padding: 12px 10px;
+      text-align: center;
+    }
+    .info-label { display: block; font-size: .68rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+    .info-val   { display: block; font-size: 1rem; font-weight: 700; color: #ffffff; }
+
+    /* ── PRECIO CLIENTE ──────────────────────────────── */
+    #precio-cliente {
+      background: #0e0e0e;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius);
+      padding: 36px 24px;
+      text-align: center;
+      color: #fff;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(0,0,0,.6);
+    }
+    #precio-cliente::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+    }
+    #precio-cliente .pc-label {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,.45);
+      margin-bottom: 8px;
+    }
+    #precio-cliente .pc-monto {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: clamp(2.4rem, 9vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 22px;
+      text-shadow: 0 0 40px rgba(255,255,255,.15);
+      animation: countIn .4s cubic-bezier(.22,.68,0,1.2) both;
+    }
+    .btn-detalle {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,.2);
+      color: rgba(255,255,255,.6);
+      font-size: .82rem;
+      font-family: 'Exo 2', sans-serif;
+      font-weight: 500;
+      padding: 9px 22px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background .15s, border-color .15s, color .15s;
+      letter-spacing: .3px;
+    }
+    .btn-detalle:hover { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.4); color: #fff; }
+
+    /* ── DETALLE COLAPSABLE ──────────────────────────── */
+    #detalle-panel {
+      display: none;
+      background: #0d0d0d;
+      border: 1px solid #1e1e1e;
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.4);
+    }
+    #detalle-panel.visible { display: block; }
+    #detalle-panel h3 {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: .95rem;
+      font-weight: 700;
+      color: rgba(255,255,255,.6);
+      margin-bottom: 14px;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+    .detalle-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 1px solid #1a1a1a;
+      font-size: .88rem;
+    }
+    .detalle-item:last-of-type { border-bottom: none; }
+    .detalle-item .nombre { color: var(--muted); }
+    .detalle-item .valor  { font-weight: 600; }
+    .detalle-item.zero    { opacity: .25; }
+    .detalle-subtotales {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed #252525;
+    }
+    .detalle-subtotales .row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      font-size: .88rem;
+    }
+    .detalle-subtotales .row.ganancia .val { color: var(--success); font-weight: 700; }
+    .detalle-subtotales .row.fabricacion .val { color: var(--muted); }
+
+    /* ── MOBILE ──────────────────────────────────────── */
+    /* ── FOOTER ──────────────────────────────────────── */
+    .nx-footer {
+      background: #050505;
+      color: rgba(255,255,255,.4);
+      text-align: center;
+      padding: 48px 24px 36px;
+      border-top: 1px solid #1a1a1a;
+      position: relative;
+    }
+    .nx-footer::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: min(300px, 60vw);
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent);
+    }
+    .footer-logo {
+      width: min(160px, 48vw);
+      margin: 0 auto 20px;
+      display: block;
+      opacity: .75;
+      filter: drop-shadow(0 0 10px rgba(255,255,255,.15));
+      transition: opacity .2s, filter .2s;
+    }
+    .footer-logo:hover { opacity: 1; filter: drop-shadow(0 0 16px rgba(255,255,255,.3)); }
+    .footer-desc {
+      font-size: .82rem;
+      line-height: 1.7;
+      max-width: 380px;
+      margin: 0 auto 18px;
+      font-weight: 300;
+    }
+    .footer-ig {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: rgba(255,255,255,.55);
+      text-decoration: none;
+      font-size: .85rem;
+      font-weight: 600;
+      margin-bottom: 18px;
+      transition: color .15s;
+    }
+    .footer-ig:hover { color: #ffffff; }
+    .footer-copy {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: .68rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      opacity: .3;
+      margin-top: 8px;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 1.05rem;
+      font-family: 'Exo 2', sans-serif;
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+      background: #0d0d0d;
+      color: var(--text);
+    }
+    textarea:focus {
+      border-color: rgba(255,255,255,.4);
+      box-shadow: 0 0 0 3px rgba(255,255,255,.05);
+      background: #141414;
+    }
+    textarea::placeholder { color: #444; }
+
+    @media (max-width: 600px) {
+      .hero { padding: 40px 16px 52px; }
+      .hero p { font-size: .92rem; }
+      .container { padding: 28px 12px 48px; }
+      .card { padding: 16px 14px; }
+      .card-header { margin-bottom: 14px; }
+      .card-icon { width: 34px; height: 34px; font-size: 1rem; border-radius: 8px; }
+      .card-title { font-size: .9rem; }
+      .section-title { font-size: 1.4rem; }
+      .info-grid { grid-template-columns: 1fr 1fr !important; }
+      .aplique-row { grid-template-columns: 1fr 1fr; }
+      .tipo-selector { grid-template-columns: 1fr 1fr; }
+      .btn-row { flex-direction: column; }
+      .btn { flex: unset; width: 100%; }
+      #precio-cliente { padding: 28px 16px; }
+    }
+
+    /* ── NEON FLEX ───────────────────────────────────── */
+    .neon-section {
+      background: #060608;
+      padding: 60px 0;
+    }
+    .neon-section .section-title { color: #fff; }
+    .neon-section .section-sub   { color: #888; }
+
+    .neon-preview-box {
+      border-radius: 16px;
+      min-height: 320px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 64px 40px;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: background .3s;
+    }
+    .neon-text-display {
+      font-size: clamp(2.8rem, 10vw, 6rem);
+      text-align: center;
+      word-break: break-word;
+      line-height: 1.3;
+      transition: color .2s, font-family .2s;
+      --nc: #ff2d78;
+      color: #fff;
+      text-shadow:
+        0 0 6px #fff,
+        0 0 12px #fff,
+        0 0 20px var(--nc),
+        0 0 40px var(--nc),
+        0 0 70px var(--nc),
+        0 0 100px var(--nc);
+      animation: nflicker 6s infinite;
+    }
+    @keyframes nflicker {
+      0%,94%,96%,98%,100% { opacity:1; }
+      95%  { opacity:.85; }
+      97%  { opacity:.7;  }
+      99%  { opacity:.9;  }
+    }
+
+    /* color swatches */
+    .swatch-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+    .swatch {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: transform .15s, border-color .15s;
+      box-shadow: 0 0 8px rgba(0,0,0,.4);
+    }
+    .swatch:hover   { transform: scale(1.15); }
+    .swatch.active  { border-color: #fff; transform: scale(1.15); }
+
+    /* font pills */
+    .font-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+    .font-pill {
+      padding: 7px 16px;
+      border-radius: 50px;
+      border: 1.5px solid #222;
+      background: #111;
+      color: var(--text);
+      cursor: pointer;
+      font-size: .88rem;
+      transition: border-color .15s, background .15s;
+    }
+    .font-pill:hover  { border-color: #444; background: #181818; }
+    .font-pill.active { border-color: rgba(255,255,255,.5); background: #1a1a1a; font-weight: 700; }
+
+    /* size cards */
+    .size-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 650px) { .size-grid { grid-template-columns: 1fr 1fr; } }
+    .size-card {
+      border: 1.5px solid #1e1e1e;
+      border-radius: 10px;
+      padding: 16px 10px;
+      text-align: center;
+      cursor: pointer;
+      background: #0d0d0d;
+      color: var(--text);
+      transition: border-color .2s, background .2s, box-shadow .2s;
+    }
+    .size-card:hover  { border-color: #383838; background: #141414; }
+    .size-card.active {
+      border-color: rgba(255,255,255,.45);
+      background: #141414;
+      box-shadow: 0 0 0 3px rgba(255,255,255,.05), 0 0 20px rgba(255,255,255,.05);
+    }
+    .size-card.disabled { opacity: .35; pointer-events: none; }
+    .size-card .s-nombre { font-size: .85rem; font-weight: 700; margin-bottom: 2px; font-family: 'Rajdhani', sans-serif; letter-spacing: .3px; }
+    .size-card .s-medida { font-size: .7rem; color: var(--muted); margin-bottom: 6px; }
+    .size-card .s-precio { font-size: 1rem; font-weight: 700; color: #ffffff; margin-bottom: 4px; font-family: 'Rajdhani', sans-serif; }
+    .size-card .s-limite { font-size: .68rem; color: #555; line-height: 1.3; }
+    .size-card.custom-btn { border-color: #2a3a2a; }
+    .size-card.custom-btn:hover { background: #111a11; border-color: rgba(110,231,183,.3); }
+    .size-card.custom-btn .s-precio { color: var(--success); }
+
+    /* word warning */
+    .word-warning {
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: #1a1500;
+      border: 1px solid #3a2e00;
+      border-radius: 8px;
+      font-size: .82rem;
+      color: #d4a700;
+      display: none;
+    }
+    .word-warning.visible { display: block; }
+
+
+    /* ── ALINEACION NEON ─────────────────────────────── */
+    .align-row { display: flex; gap: 8px; margin-top: 10px; }
+    .align-btn {
+      flex: 1;
+      padding: 8px;
+      border: 1.5px solid #1e1e1e;
+      border-radius: 8px;
+      background: #0d0d0d;
+      color: var(--text);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+    .align-btn:hover  { border-color: #383838; background: #141414; }
+    .align-btn.active { border-color: rgba(255,255,255,.4); background: #141414; }
+
+    /* ── ACRILICO NEON ───────────────────────────────── */
+    .neon-acrylic {
+      display: inline-block;
+      filter: url(#acrylic-svg-filter);
+    }
+
+    /* ── NEON OVERLAY ────────────────────────────────── */
+    .neon-info-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(4px);
+      border-radius: 0 0 16px 16px;
+    }
+    .neon-info-overlay #neon-overlay-medida {
+      font-size: .85rem;
+      color: rgba(255,255,255,.7);
+      letter-spacing: .5px;
+    }
+    .neon-info-overlay #neon-overlay-precio {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #fff;
+      text-shadow: 0 0 10px #bf00ff, 0 0 20px #bf00ff;
+    }
+
+    /* ── ENTRANCE ANIMATIONS ─────────────────────────── */
+    .container { animation: fadeInUp .5s .1s both; }
+    .card:nth-child(1) { animation: fadeInUp .45s .05s both; }
+    .card:nth-child(2) { animation: fadeInUp .45s .12s both; }
+    .card:nth-child(3) { animation: fadeInUp .45s .19s both; }
+    .card:nth-child(4) { animation: fadeInUp .45s .26s both; }
+    .card:nth-child(5) { animation: fadeInUp .45s .33s both; }
+    .card:nth-child(6) { animation: fadeInUp .45s .40s both; }
+    .card:nth-child(7) { animation: fadeInUp .45s .47s both; }
+
+    /* ── PRINT ────────────────────────────────────────── */
+    @media print {
+      .hero, .section-title, .section-sub, .card, .btn-row { display: none !important; }
+      #precio-cliente, #detalle-panel { display: block !important; box-shadow: none; }
+      #detalle-panel { border: 1px solid #000; }
+      body { background: #fff; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <img src="Recursos/NEXUS.png" alt="Nexus LED" class="hero-logo" />
+  <div class="hero-tagline">Avisos · Neon Flex · Iluminacion LED</div>
+  <h1>Cotizador de Avisos</h1>
+  <p>Calcula al instante el precio de tu aviso en acrilico iluminado o Neon Flex. Diseño profesional, fabricacion a medida.</p>
+  <div class="hero-actions">
+    <a href="#calculadora" class="btn-hero">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 8 16 12 12 16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Cotizar ahora
+    </a>
+    <a href="https://instagram.com/nexusled.co" target="_blank" class="btn-hero-outline">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      @nexusled.co
+    </a>
+  </div>
+  <a href="https://instagram.com/nexusled.co" target="_blank" class="hero-instagram">
+    <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.334 3.608 1.308.975.975 1.246 2.242 1.308 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.334 2.633-1.308 3.608-.975.975-2.242 1.246-3.608 1.308-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.334-3.608-1.308-.975-.975-1.246-2.242-1.308-3.608C2.175 15.584 2.163 15.204 2.163 12s.012-3.584.07-4.85c.062-1.366.334-2.633 1.308-3.608C4.516 2.497 5.783 2.225 7.15 2.163 8.416 2.105 8.796 2.163 12 2.163zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98C.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+    Siguenos en Instagram
+  </a>
+  <div class="hero-divider"></div>
+</header>
+
+<!-- CALCULADORA -->
+<main class="container" id="calculadora">
+  <h2 class="section-title">Calculadora de Cotizacion</h2>
+  <p class="section-sub">Completa los campos que apliquen a tu aviso. Los que no uses puedes dejarlos en cero.</p>
+
+  <!-- TIPO DE AVISO -->
+  <div class="card" style="margin-bottom:28px;">
+    <div class="card-header" style="margin-bottom:14px;">
+      <div class="card-icon">📋</div>
+      <div>
+        <div class="card-title">Tipo de aviso</div>
+        <div class="card-desc">Selecciona como esta compuesto el aviso</div>
+      </div>
+    </div>
+    <div class="tipo-selector" style="grid-template-columns: repeat(3,1fr);">
+      <button class="tipo-btn active" id="btn_nube" onclick="setTipo('nube')">
+        <span class="tipo-icon">☁️</span>
+        <span class="tipo-nombre">Nube</span>
+        <span class="tipo-hint">Figura rectangular continua</span>
+      </button>
+      <button class="tipo-btn" id="btn_letra" onclick="setTipo('letra')">
+        <span class="tipo-icon">🔤</span>
+        <span class="tipo-nombre">Letra a letra</span>
+        <span class="tipo-hint">Letras o piezas individuales</span>
+      </button>
+      <button class="tipo-btn" id="btn_neon" onclick="setTipo('neon')">
+        <span class="tipo-icon">💡</span>
+        <span class="tipo-nombre">Neon Flex</span>
+        <span class="tipo-hint">Letrero luminoso neon</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="calc-regular">
+  <!-- TAPA ACRILICO -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">🔷</div>
+      <div>
+        <div class="card-title">Medidas del aviso</div>
+        <div class="card-desc">Ancho y alto en centimetros</div>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for="tapa_ancho">Ancho (cm)</label>
+        <input type="number" id="tapa_ancho" min="0" step="0.5" placeholder="Ej: 60" oninput="calcular()" />
+      </div>
+      <div class="field">
+        <label for="tapa_alto">Alto (cm)</label>
+        <input type="number" id="tapa_alto" min="0" step="0.5" placeholder="Ej: 40" oninput="calcular()" />
+      </div>
+    </div>
+  </div>
+
+  <!-- APLIQUES -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">🎨</div>
+      <div>
+        <div class="card-title">Apliques de Acrilico</div>
+        <div class="card-desc">Colores adicionales sobre el aviso</div>
+      </div>
+    </div>
+    <div class="field">
+      <label for="apliques_cantidad">¿Cuantos apliques (colores) lleva?</label>
+      <input type="number" id="apliques_cantidad" min="0" max="10" step="1" placeholder="Ej: 2" oninput="generarApliques()" />
+    </div>
+    <div id="apliques_container"></div>
+  </div>
+
+  <!-- FAJA -->
+  <div class="card" id="card_faja" style="display:none;">
+    <div class="card-header">
+      <div class="card-icon">📐</div>
+      <div>
+        <div class="card-title">Faja / Cantonera</div>
+        <div class="card-desc" id="faja_desc">Cantonera lateral del aviso</div>
+      </div>
+    </div>
+
+    <!-- modo letra -->
+    <div id="faja_manual">
+      <div class="field">
+        <label for="faja_perimetro">Perimetro total (cm)</label>
+        <input type="number" id="faja_perimetro" min="0" step="1" placeholder="Ej: 340" oninput="calcular()" />
+      </div>
+      <div class="toggle-row" style="margin-top:4px;">
+        <div>
+          <div class="toggle-label" style="font-size:.85rem;">Faja mas gruesa</div>
+          <div class="toggle-desc">Por defecto 6 cm</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="faja_gruesa" onchange="toggleFajaGruesa()" />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="extra-panel" id="faja_gruesa_panel">
+        <div class="field" style="margin-bottom:0">
+          <label for="faja_ancho_custom">Ancho de la faja (cm)</label>
+          <input type="number" id="faja_ancho_custom" min="6" step="0.5" placeholder="Ej: 8" oninput="calcular()" />
+        </div>
+      </div>
+    </div>
+
+    <!-- modo nube: calculo automatico (oculto, solo para JS) -->
+    <div id="faja_auto" style="display:none;">
+      <span id="nube_perimetro"></span>
+      <span id="nube_fajas"></span>
+      <span id="nube_ancho_faja"></span>
+    </div>
+  </div>
+
+  <!-- PVC -->
+  <div class="card" style="display:none;">
+    <div class="card-header">
+      <div class="card-icon">🪟</div>
+      <div>
+        <div class="card-title">Tapa de PVC</div>
+        <div class="card-desc">$3 por cm² — calculado automaticamente</div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="info-label">Area</span>
+        <span class="info-val" id="pvc_area">—</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Costo</span>
+        <span class="info-val" id="pvc_costo">—</span>
+      </div>
+    </div>
+    <div class="input-hint" style="margin-top:10px;">Calculado automaticamente segun las medidas de la tapa</div>
+  </div>
+
+  <!-- LUZ -->
+  <div class="card" style="display:none;">
+    <div class="card-header">
+      <div class="card-icon">💡</div>
+      <div>
+        <div class="card-title">Iluminacion — Cinta LED</div>
+        <div class="card-desc">Serpentina rectangular con margen del 5%</div>
+      </div>
+    </div>
+    <div class="input-hint" style="margin-bottom:12px;">Separacion fija: 7 cm entre pasadas &nbsp;·&nbsp; $5.000 por metro</div>
+    <div class="info-grid" style="grid-template-columns: repeat(4, 1fr);">
+      <div class="info-item">
+        <span class="info-label">Pasadas</span>
+        <span class="info-val" id="led_pasadas">—</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Tramos rectos</span>
+        <span class="info-val" id="led_rectos">—</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Curvas</span>
+        <span class="info-val" id="led_curvas">—</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Total cinta</span>
+        <span class="info-val" id="led_total_m">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRANSPORTE / INSTALACION -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">🚚</div>
+      <div>
+        <div class="card-title">Transporte e Instalacion</div>
+        <div class="card-desc" id="transporte_desc">Sin instalacion</div>
+      </div>
+    </div>
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">¿Requiere instalacion?</div>
+        <div class="toggle-desc">Incluye transporte y montaje en sitio</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="transporte" onchange="calcular()" />
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <!-- VINILO -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">🎨</div>
+      <div>
+        <div class="card-title">Vinilo</div>
+        <div class="card-desc">$45.000 por m²</div>
+      </div>
+    </div>
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">¿Lleva vinilo?</div>
+        <div class="toggle-desc">Aplicacion de vinilo de corte o impreso</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="vinilo_check" onchange="toggleVinilo()" />
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="extra-panel" id="vinilo_panel">
+      <div class="field-row">
+        <div class="field" style="margin-bottom:0">
+          <label for="vinilo_ancho">Ancho (cm)</label>
+          <input type="number" id="vinilo_ancho" min="0" step="0.5" placeholder="Ej: 120" oninput="calcular()" />
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label for="vinilo_alto">Alto (cm)</label>
+          <input type="number" id="vinilo_alto" min="0" step="0.5" placeholder="Ej: 80" oninput="calcular()" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ESTRUCTURA -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">🏗️</div>
+      <div>
+        <div class="card-title">Estructura</div>
+        <div class="card-desc">Soporte metalico o base del aviso</div>
+      </div>
+    </div>
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">¿Necesita estructura?</div>
+        <div class="toggle-desc">Soporte adicional para el aviso</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="estructura_check" onchange="calcular()" />
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="toggle-row" style="margin-top:14px;">
+      <div>
+        <div class="toggle-label" style="font-size:.85rem;">Estructura especial</div>
+        <div class="toggle-desc">Activar para ingresar precio manualmente</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="estructura_override" onchange="toggleEstructura()" />
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="extra-panel" id="estructura_panel">
+      <div class="field" style="margin-bottom:0">
+        <label for="estructura_manual">Valor de la estructura (COP)</label>
+        <input type="number" id="estructura_manual" min="0" step="1000" placeholder="Ej: 200000" oninput="calcular()" />
+      </div>
+    </div>
+  </div>
+
+  <!-- MANO DE OBRA -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">🔧</div>
+      <div>
+        <div class="card-title">Mano de Obra</div>
+        <div class="card-desc" id="mdo_desc">Incluida en el precio</div>
+      </div>
+    </div>
+    <div class="toggle-row" style="margin-bottom:0">
+      <div>
+        <div class="toggle-label">Modificar mano de obra</div>
+        <div class="toggle-desc">Activar para casos especiales</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="mdo_override" onchange="toggleMdo()" />
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="extra-panel" id="mdo_panel">
+      <div class="field" style="margin-bottom:0">
+        <label for="mdo_manual">Valor mano de obra (COP)</label>
+        <input type="number" id="mdo_manual" min="0" step="1000" placeholder="Ej: 180000" oninput="calcular()" />
+      </div>
+    </div>
+  </div>
+
+  <!-- PRECIO CLIENTE -->
+  <div id="precio-cliente">
+    <div class="pc-label">Valor del aviso</div>
+    <div class="pc-monto" id="v_publico">$0</div>
+    <button class="btn-detalle" onclick="toggleDetalle()">Ver cotizacion detallada ↓</button>
+  </div>
+
+  <!-- DETALLE INTERNO -->
+  <div id="detalle-panel">
+    <h3>Desglose de costos</h3>
+
+    <div class="detalle-item" id="r_tapa">
+      <span class="nombre">Tapa acrilico</span>
+      <span class="valor" id="v_tapa">$0</span>
+    </div>
+    <div class="detalle-item" id="r_apliques">
+      <span class="nombre">Apliques de acrilico</span>
+      <span class="valor" id="v_apliques">$0</span>
+    </div>
+    <div class="detalle-item" id="r_faja">
+      <span class="nombre">Faja / cantonera</span>
+      <span class="valor" id="v_faja">$0</span>
+    </div>
+    <div class="detalle-item" id="r_pvc">
+      <span class="nombre">Tapa PVC</span>
+      <span class="valor" id="v_pvc">$0</span>
+    </div>
+    <div class="detalle-item" id="r_luz">
+      <span class="nombre">Cinta LED</span>
+      <span class="valor" id="v_luz">$0</span>
+    </div>
+    <div class="detalle-item" id="r_mdo">
+      <span class="nombre">Mano de obra</span>
+      <span class="valor" id="v_mdo">$0</span>
+    </div>
+    <div class="detalle-item" id="r_estructura">
+      <span class="nombre">Estructura</span>
+      <span class="valor" id="v_estructura">$0</span>
+    </div>
+    <div class="detalle-item" id="r_transporte">
+      <span class="nombre">Transporte / instalacion</span>
+      <span class="valor" id="v_transporte">$0</span>
+    </div>
+    <div class="detalle-item" id="r_vinilo">
+      <span class="nombre">Vinilo</span>
+      <span class="valor" id="v_vinilo">$0</span>
+    </div>
+
+    <div class="detalle-subtotales">
+      <div class="row fabricacion">
+        <span>Costo fabricacion (60%)</span>
+        <span class="val" id="v_total">$0</span>
+      </div>
+      <div class="row ganancia">
+        <span>Ganancia (40%)</span>
+        <span class="val" id="v_ganancia">$0</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="window.print()">Imprimir</button>
+    <button class="btn btn-outline" onclick="limpiar()">↺ Nueva cotizacion</button>
+  </div>
+  </div><!-- /calc-regular -->
+
+  <!-- NEON FLEX (integrado) -->
+  <div id="calc-neon" style="display:none;">
+    <!-- 1. TEXTO -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header">
+        <div class="card-icon">✏️</div>
+        <div>
+          <div class="card-title">Escribe tu texto</div>
+          <div class="card-desc">El limite de palabras depende del tamaño elegido</div>
+        </div>
+      </div>
+      <textarea id="neon-input" placeholder="Ej: Bienvenidos&#10;(Enter para nueva linea)" oninput="neonActualizar()" rows="3" style="font-size:1.05rem;resize:vertical;"></textarea>
+      <div class="align-row">
+        <button class="align-btn active" id="align-left"   onclick="neonAlign('left')"   title="Izquierda">&#8676;</button>
+        <button class="align-btn"        id="align-center" onclick="neonAlign('center')" title="Centrar">&#8691;</button>
+        <button class="align-btn"        id="align-right"  onclick="neonAlign('right')"  title="Derecha">&#8677;</button>
+      </div>
+      <div class="word-warning" id="neon-warning"></div>
+    </div>
+
+    <!-- 2. TAMAÑO -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header">
+        <div class="card-icon">📐</div>
+        <div>
+          <div class="card-title">Tamaño</div>
+          <div class="card-desc">El limite de palabras es importante para que el texto quede bien</div>
+        </div>
+      </div>
+      <div class="size-grid">
+        <div class="size-card active" id="size-small" onclick="neonTamano('small')">
+          <div class="s-nombre">Pequeño</div>
+          <div class="s-medida">60 × 45 cm</div>
+          <div class="s-precio">$180.000</div>
+          <div class="s-limite">⚠️ Máximo<br><strong>2 palabras</strong></div>
+        </div>
+        <div class="size-card" id="size-medium" onclick="neonTamano('medium')">
+          <div class="s-nombre">Mediano</div>
+          <div class="s-medida">80 × 50 cm</div>
+          <div class="s-precio">$250.000</div>
+          <div class="s-limite">⚠️ Máximo<br><strong>3 palabras</strong></div>
+        </div>
+        <div class="size-card" id="size-large" onclick="neonTamano('large')">
+          <div class="s-nombre">Grande</div>
+          <div class="s-medida">100 × 60 cm</div>
+          <div class="s-precio">$340.000</div>
+          <div class="s-limite">⚠️ Máximo<br><strong>5 palabras</strong></div>
+        </div>
+        <div class="size-card custom-btn" onclick="neonWhatsapp()">
+          <div class="s-nombre">Personalizado</div>
+          <div class="s-medida">Medida especial</div>
+          <div class="s-precio">Consultar</div>
+          <div class="s-limite">Sin limite<br>de palabras</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtro SVG acrilico (invisible, solo definicion) -->
+    <svg style="position:absolute;width:0;height:0;overflow:hidden;" aria-hidden="true">
+      <defs>
+        <filter id="acrylic-svg-filter" x="-25%" y="-50%" width="150%" height="200%">
+          <!-- silueta dilatada = forma del acrilico -->
+          <feMorphology in="SourceAlpha" operator="dilate" radius="7" result="silueta"/>
+          <!-- relleno frosted del acrilico -->
+          <feFlood flood-color="#ffffff" flood-opacity="0.07" result="acrylicFill"/>
+          <feComposite in="acrylicFill" in2="silueta" operator="in" result="relleno"/>
+          <!-- borde: diferencia entre silueta exterior e interior -->
+          <feMorphology in="SourceAlpha" operator="dilate" radius="7" result="bordeExt"/>
+          <feMorphology in="SourceAlpha" operator="dilate" radius="4" result="bordeInt"/>
+          <feComposite in="bordeExt" in2="bordeInt" operator="out" result="anillo"/>
+          <!-- color del borde segun neon -->
+          <feFlood id="acrylic-flood-edge" flood-color="#ff2d78" flood-opacity="0.85" result="colorBorde"/>
+          <feComposite in="colorBorde" in2="anillo" operator="in" result="bordeColoreado"/>
+          <!-- suavizar el borde -->
+          <feGaussianBlur in="bordeColoreado" stdDeviation="1.5" result="bordeGlow"/>
+          <!-- halo exterior difuso -->
+          <feGaussianBlur in="silueta" stdDeviation="8" result="haloBlur"/>
+          <feFlood id="acrylic-flood-halo" flood-color="#ff2d78" flood-opacity="0.28" result="colorHalo"/>
+          <feComposite in="colorHalo" in2="haloBlur" operator="in" result="halo"/>
+          <!-- mezcla final: halo + relleno + borde + texto original -->
+          <feMerge>
+            <feMergeNode in="halo"/>
+            <feMergeNode in="relleno"/>
+            <feMergeNode in="bordeGlow"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+    </svg>
+
+    <!-- 3. PREVIEW con precio superpuesto -->
+    <div style="position:relative; margin-bottom:16px;">
+      <div class="neon-preview-box" id="neon-bg" style="background:#0a0a0a;">
+        <div class="neon-acrylic" id="neon-acrylic">
+        <div class="neon-text-display" id="neon-display" style="font-family:'Allanis';">Tu Texto</div>
+      </div>
+      </div>
+      <div class="neon-info-overlay">
+        <span id="neon-overlay-medida">60 × 45 cm</span>
+        <span id="neon-overlay-precio">$180.000</span>
+      </div>
+    </div>
+
+    <!-- 4. TIPOGRAFIA -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header">
+        <div class="card-icon">🔤</div>
+        <div><div class="card-title">Tipografia</div></div>
+      </div>
+      <div class="font-row">
+        <button class="font-pill active" style="font-family:'Allanis'"      onclick="neonFont('Allanis')">Allanis</button>
+        <button class="font-pill"        style="font-family:'Barcelony'"    onclick="neonFont('Barcelony')">Barcelony</button>
+        <button class="font-pill"        style="font-family:'Barokah'"      onclick="neonFont('Barokah')">Barokah</button>
+        <button class="font-pill"        style="font-family:'Cosmopolitan'" onclick="neonFont('Cosmopolitan')">Cosmopolitan</button>
+        <button class="font-pill"        style="font-family:'Elegant'"      onclick="neonFont('Elegant')">Elegant</button>
+        <button class="font-pill"        style="font-family:'HanleyPro'"    onclick="neonFont('HanleyPro')">Hanley Pro</button>
+        <button class="font-pill"        style="font-family:'Hattinand'"    onclick="neonFont('Hattinand')">Hattinand</button>
+        <button class="font-pill"        style="font-family:'Sacramento'"   onclick="neonFont('Sacramento')">Sacramento</button>
+      </div>
+    </div>
+
+    <!-- 5. COLOR NEON -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header">
+        <div class="card-icon">🌈</div>
+        <div><div class="card-title">Color del neon</div></div>
+      </div>
+      <div class="swatch-row" id="swatches-color">
+        <div class="swatch active" style="background:#ff2d78;" onclick="neonColor(this,'#ff2d78')" title="Rosa"></div>
+        <div class="swatch" style="background:#00f3ff;" onclick="neonColor(this,'#00f3ff')" title="Cyan"></div>
+        <div class="swatch" style="background:#39ff14;" onclick="neonColor(this,'#39ff14')" title="Verde"></div>
+        <div class="swatch" style="background:#ffff00;" onclick="neonColor(this,'#ffff00')" title="Amarillo"></div>
+        <div class="swatch" style="background:#ff6b00;" onclick="neonColor(this,'#ff6b00')" title="Naranja"></div>
+        <div class="swatch" style="background:#bf00ff;" onclick="neonColor(this,'#bf00ff')" title="Morado"></div>
+        <div class="swatch" style="background:#ffffff;box-shadow:0 0 0 1px #ccc;" onclick="neonColor(this,'#ffffff')" title="Blanco"></div>
+        <div class="swatch" style="background:#ff4444;" onclick="neonColor(this,'#ff4444')" title="Rojo"></div>
+      </div>
+    </div>
+
+    <!-- 6. COLOR FONDO -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header">
+        <div class="card-icon">🖼️</div>
+        <div><div class="card-title">Color del fondo</div></div>
+      </div>
+      <div class="swatch-row" id="swatches-bg">
+        <div class="swatch active" style="background:#0a0a0a;box-shadow:0 0 0 1px #555;" onclick="neonBg(this,'#0a0a0a')" title="Negro"></div>
+        <div class="swatch" style="background:#0a0a2e;" onclick="neonBg(this,'#0a0a2e')" title="Azul oscuro"></div>
+        <div class="swatch" style="background:#0a1a0a;" onclick="neonBg(this,'#0a1a0a')" title="Verde oscuro"></div>
+        <div class="swatch" style="background:#1a0010;" onclick="neonBg(this,'#1a0010')" title="Vino oscuro"></div>
+        <div class="swatch" style="background:#1a1a1a;box-shadow:0 0 0 1px #555;" onclick="neonBg(this,'#1a1a1a')" title="Gris oscuro"></div>
+        <div class="swatch" style="background:#ffffff;box-shadow:0 0 0 1px #ccc;" onclick="neonBg(this,'#ffffff')" title="Blanco"></div>
+      </div>
+    </div>
+
+    <!-- 7. INSTALACION -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header">
+        <div class="card-icon">🔧</div>
+        <div>
+          <div class="card-title">Instalacion</div>
+          <div class="card-desc">Montaje profesional en sitio</div>
+        </div>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">¿Con instalacion?</div>
+          <div class="toggle-desc">Incluye desplazamiento y montaje</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="neon-instalacion" onchange="neonActualizar()" />
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </div><!-- /calc-neon -->
+
+</main>
+
+<script>
+  const fmt = n => new Intl.NumberFormat('es-CO', {
+    style: 'currency', currency: 'COP',
+    minimumFractionDigits: 0, maximumFractionDigits: 0
+  }).format(n);
+
+  const val = id => parseFloat(document.getElementById(id).value) || 0;
+
+  let tipoActivo = 'nube';
+
+  function setTipo(tipo) {
+    tipoActivo = tipo;
+    ['nube','letra','neon'].forEach(t =>
+      document.getElementById('btn_' + t).classList.toggle('active', t === tipo)
+    );
+    const esNeon = tipo === 'neon';
+    document.getElementById('calc-regular').style.display = esNeon ? 'none' : '';
+    document.getElementById('calc-neon').style.display    = esNeon ? ''     : 'none';
+    if (!esNeon) {
+      document.getElementById('faja_manual').style.display = tipo === 'letra' ? '' : 'none';
+      document.getElementById('faja_auto').style.display   = 'none';
+      document.getElementById('card_faja').style.display   = tipo === 'letra' ? '' : 'none';
+      calcular();
+    }
+  }
+
+  function calcularFajaNube(ancho, alto) {
+    if (!ancho || !alto) return 0;
+    const perimetro   = 2 * (ancho + alto);
+    const numFajas    = Math.ceil(perimetro / 120);
+    const anchoFaja   = (ancho >= 120 || alto >= 120) ? 8 : 7;
+    // actualizar panel informativo
+    document.getElementById('nube_perimetro').textContent  = perimetro + ' cm';
+    document.getElementById('nube_fajas').textContent      = numFajas;
+    document.getElementById('nube_ancho_faja').textContent = anchoFaja + ' cm';
+    return anchoFaja * 1500 * numFajas;
+  }
+
+  function calcular() {
+    const ancho = val('tapa_ancho');
+    const alto  = val('tapa_alto');
+    const tapa  = ancho * alto * 18;
+
+    let faja;
+    if (tipoActivo === 'nube') {
+      faja = calcularFajaNube(ancho, alto);
+    } else {
+      const perimetro  = val('faja_perimetro');
+      const numFajas   = perimetro ? Math.ceil(perimetro / 120) : 0;
+      const anchoFaja  = document.getElementById('faja_gruesa').checked
+                           ? (val('faja_ancho_custom') || 6) : 6;
+      faja = numFajas * anchoFaja * 1500;
+    }
+
+    const areaCm2    = ancho * alto;
+    const pvc        = areaCm2 * 3;
+    document.getElementById('pvc_area').textContent  = areaCm2 ? areaCm2.toLocaleString('es-CO') + ' cm²' : '—';
+    document.getElementById('pvc_costo').textContent = areaCm2 ? fmt(pvc) : '—';
+    const preciom = 5000;
+    let luz = 0;
+    if (tipoActivo === 'letra') {
+      const perimetroM = val('faja_perimetro') / 100;
+      luz = perimetroM * preciom;
+    } else if (ancho && alto) {
+      const separacion   = 7;
+      const pasadas      = alto / separacion;
+      const rectoCm      = pasadas * ancho;
+      const curvasCm     = pasadas * (separacion * Math.PI / 2);
+      const totalCm      = (rectoCm + curvasCm) * 1.05;
+      const totalM       = totalCm / 100;
+      luz = totalM * preciom;
+      document.getElementById('led_pasadas').textContent  = pasadas.toFixed(1);
+      document.getElementById('led_rectos').textContent   = (rectoCm / 100).toFixed(2) + ' m';
+      document.getElementById('led_curvas').textContent   = (curvasCm / 100).toFixed(2) + ' m';
+      document.getElementById('led_total_m').textContent  = totalM.toFixed(2) + ' m';
+    } else {
+      ['led_pasadas','led_rectos','led_curvas','led_total_m'].forEach(id => document.getElementById(id).textContent = '—');
+    }
+    const instalacion = document.getElementById('transporte').checked;
+    const grande      = ancho > 150 || alto > 150;
+    const transporte  = instalacion ? 60000 : 10000;
+    document.getElementById('transporte_desc').textContent = instalacion
+      ? (grande ? 'Con instalacion — aviso grande' : 'Con instalacion')
+      : 'Sin instalacion';
+    const vinilo     = document.getElementById('vinilo_check').checked
+                         ? (val('vinilo_ancho') * val('vinilo_alto') / 10000) * 45000 : 0;
+    const apliques   = calcularApliques();
+    const mdo        = calcularMdo(ancho, alto);
+    const necesitaEstructura = document.getElementById('estructura_check').checked;
+    const estructura = necesitaEstructura
+      ? (document.getElementById('estructura_override').checked
+          ? (parseFloat(document.getElementById('estructura_manual').value) || 0)
+          : 100000)
+      : 0;
+
+    const items = { tapa, apliques, faja, pvc, luz, mdo, estructura, transporte, vinilo };
+
+    for (const [key, monto] of Object.entries(items)) {
+      document.getElementById('v_' + key).textContent = fmt(monto);
+      document.getElementById('r_' + key).classList.toggle('zero', monto === 0);
+    }
+
+    const total    = Object.values(items).reduce((a, b) => a + b, 0);
+    const publico  = total / 0.60;
+    const ganancia = publico - total;
+    document.getElementById('v_total').textContent    = fmt(total);
+    document.getElementById('v_ganancia').textContent = fmt(ganancia);
+    document.getElementById('v_publico').textContent  = fmt(publico);
+  }
+
+  const COLORES = [
+    { nombre: 'Rojo',          precio: 18 },
+    { nombre: 'Verde',         precio: 18 },
+    { nombre: 'Amarillo',      precio: 18 },
+    { nombre: 'Naranja',       precio: 18 },
+    { nombre: 'Azul',          precio: 18 },
+    { nombre: 'Blanco',        precio: 18 },
+    { nombre: 'Aguamarina',    precio: 18 },
+    { nombre: 'Marron',        precio: 18 },
+    { nombre: 'Morado',        precio: 18 },
+    { nombre: 'Dorado espejo', precio: 30 },
+    { nombre: 'Plata espejo',  precio: 30 },
+    { nombre: 'Rosa espejo',   precio: 30 },
+  ];
+
+  function generarApliques() {
+    const n = Math.min(parseInt(document.getElementById('apliques_cantidad').value) || 0, 10);
+    const container = document.getElementById('apliques_container');
+
+    // guardar valores existentes
+    const prev = [...container.querySelectorAll('.aplique-row')].map(r => ({
+      color: r.querySelector('select').value,
+      ancho: r.querySelector('.apl-ancho').value,
+      alto:  r.querySelector('.apl-alto').value,
+    }));
+
+    container.innerHTML = '';
+    for (let i = 0; i < n; i++) {
+      const opts = COLORES.map(c =>
+        `<option value="${c.precio}" ${prev[i]?.color == c.precio && i < prev.length ? '' : ''}>${c.nombre}</option>`
+      ).join('');
+
+      const row = document.createElement('div');
+      row.className = 'aplique-row';
+      row.innerHTML = `
+        <div class="aplique-num">Aplique ${i + 1}</div>
+        <div class="field" style="margin:0">
+          <label>Color</label>
+          <select onchange="calcular()">${opts}</select>
+        </div>
+        <div class="field" style="margin:0">
+          <label>Ancho (cm)</label>
+          <input type="number" class="apl-ancho" min="0" step="0.5" placeholder="Ej: 30" oninput="calcular()" value="${prev[i]?.ancho || ''}" />
+        </div>
+        <div class="field" style="margin:0">
+          <label>Alto (cm)</label>
+          <input type="number" class="apl-alto" min="0" step="0.5" placeholder="Ej: 20" oninput="calcular()" value="${prev[i]?.alto || ''}" />
+        </div>
+        <div class="aplique-subtotal">Subtotal: <span id="apl_sub_${i}">$0</span></div>
+      `;
+      container.appendChild(row);
+    }
+    calcular();
+  }
+
+  function calcularApliques() {
+    let total = 0;
+    document.querySelectorAll('.aplique-row').forEach((row, i) => {
+      const precio  = parseFloat(row.querySelector('select').value) || 18;
+      const ancho   = parseFloat(row.querySelector('.apl-ancho').value) || 0;
+      const alto    = parseFloat(row.querySelector('.apl-alto').value)  || 0;
+      const sub     = ancho * alto * precio;
+      total += sub;
+      const el = document.getElementById('apl_sub_' + i);
+      if (el) el.textContent = fmt(sub);
+    });
+    return total;
+  }
+
+  function calcularMdo(ancho, alto) {
+    const override = document.getElementById('mdo_override').checked;
+    if (override) return parseFloat(document.getElementById('mdo_manual').value) || 0;
+    const max = Math.max(ancho || 0, alto || 0);
+    let precio, desc;
+    if (max <= 80)      { precio = 100000; desc = 'Incluida en el precio'; }
+    else if (max <= 100){ precio = 150000; desc = 'Incluida en el precio'; }
+    else                { precio = 220000; desc = 'Incluida en el precio'; }
+    if (!max) desc = 'Incluida en el precio';
+    document.getElementById('mdo_desc').textContent = desc;
+    return precio;
+  }
+
+  function toggleEstructura() {
+    const panel = document.getElementById('estructura_panel');
+    panel.classList.toggle('visible', document.getElementById('estructura_override').checked);
+    calcular();
+  }
+
+  function toggleFajaGruesa() {
+    const panel = document.getElementById('faja_gruesa_panel');
+    panel.classList.toggle('visible', document.getElementById('faja_gruesa').checked);
+    calcular();
+  }
+
+  function toggleMdo() {
+    const panel = document.getElementById('mdo_panel');
+    const override = document.getElementById('mdo_override').checked;
+    panel.classList.toggle('visible', override);
+    if (override) {
+      const ancho = val('tapa_ancho'), alto = val('tapa_alto');
+      const max = Math.max(ancho, alto);
+      const auto = max <= 80 ? 100000 : max <= 100 ? 150000 : 220000;
+      document.getElementById('mdo_manual').value = auto || '';
+    }
+    calcular();
+  }
+
+  function toggleDetalle() {
+    const panel = document.getElementById('detalle-panel');
+    const btn   = document.querySelector('.btn-detalle');
+    const visible = panel.classList.toggle('visible');
+    btn.textContent = visible ? 'Ocultar detalle ↑' : 'Ver cotizacion detallada ↓';
+  }
+
+  function toggleVinilo() {
+    const panel = document.getElementById('vinilo_panel');
+    panel.classList.toggle('visible', document.getElementById('vinilo_check').checked);
+    calcular();
+  }
+
+  function limpiar() {
+    ['tapa_ancho','tapa_alto','faja_perimetro','faja_ancho_custom','vinilo_ancho','vinilo_alto']
+      .forEach(id => document.getElementById(id).value = '');
+    document.getElementById('apliques_cantidad').value = '';
+    document.getElementById('apliques_container').innerHTML = '';
+    document.getElementById('transporte').checked = false;
+    document.getElementById('faja_gruesa').checked = false;
+    document.getElementById('faja_gruesa_panel').classList.remove('visible');
+    document.getElementById('estructura_check').checked = false;
+    document.getElementById('estructura_override').checked = false;
+    document.getElementById('estructura_manual').value = '';
+    document.getElementById('estructura_panel').classList.remove('visible');
+    document.getElementById('mdo_override').checked = false;
+    document.getElementById('mdo_manual').value = '';
+    document.getElementById('mdo_panel').classList.remove('visible');
+    document.getElementById('vinilo_check').checked = false;
+    document.getElementById('vinilo_panel').classList.remove('visible');
+    document.getElementById('detalle-panel').classList.remove('visible');
+    document.querySelector('.btn-detalle').textContent = 'Ver cotizacion detallada ↓';
+    calcular();
+  }
+
+  // inicializar en modo nube al cargar
+  setTipo('nube');
+
+  /* ══════════════ NEON FLEX ══════════════ */
+  const NEON_SIZES = {
+    small:  { precio: 180000, maxPalabras: 2, nombre: 'Pequeño'  },
+    medium: { precio: 250000, maxPalabras: 3, nombre: 'Mediano'  },
+    large:  { precio: 340000, maxPalabras: 5, nombre: 'Grande'   },
+  };
+  let neonTamanoActivo = 'small';
+
+  // NÚMERO DE WHATSAPP — cambia este número por el tuyo
+  const WHATSAPP_NUM = '573204587531';
+
+  function neonPalabras() {
+    return (document.getElementById('neon-input').value.trim().split(/\s+/).filter(Boolean)).length;
+  }
+
+  function neonActualizar() {
+    const raw   = document.getElementById('neon-input').value;
+    const texto = raw.trim() || 'Tu Texto';
+    const display = document.getElementById('neon-display');
+    // renderizar saltos de línea como <br>
+    display.innerHTML = texto.replace(/\n/g, '<br>');
+    const palabras = neonPalabras();
+    const size     = NEON_SIZES[neonTamanoActivo];
+    const warning  = document.getElementById('neon-warning');
+
+    if (neonTamanoActivo !== 'custom' && size && palabras > size.maxPalabras) {
+      warning.textContent = `⚠️ El tamaño ${size.nombre} permite máximo ${size.maxPalabras} palabra${size.maxPalabras > 1 ? 's' : ''}. Actualmente tienes ${palabras}. Elige un tamaño mayor o reduce el texto.`;
+      warning.classList.add('visible');
+    } else {
+      warning.classList.remove('visible');
+    }
+    neonPrecio();
+  }
+
+  function neonFont(fuente) {
+    document.getElementById('neon-display').style.fontFamily = `'${fuente}', cursive, sans-serif`;
+    document.querySelectorAll('.font-pill').forEach(p => p.classList.remove('active'));
+    event.target.classList.add('active');
+  }
+
+  function neonColor(el, color) {
+    document.getElementById('neon-display').style.textShadow =
+      `0 0 6px #fff, 0 0 12px #fff, 0 0 20px ${color}, 0 0 40px ${color}, 0 0 70px ${color}, 0 0 100px ${color}`;
+    document.getElementById('acrylic-flood-edge').setAttribute('flood-color', color);
+    document.getElementById('acrylic-flood-halo').setAttribute('flood-color', color);
+    document.querySelectorAll('#swatches-color .swatch').forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function neonBg(el, color) {
+    document.getElementById('neon-bg').style.background = color;
+    document.querySelectorAll('#swatches-bg .swatch').forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function neonTamano(tamano) {
+    neonTamanoActivo = tamano;
+    ['small','medium','large'].forEach(s => {
+      document.getElementById('size-' + s).classList.toggle('active', s === tamano);
+    });
+    neonActualizar();
+  }
+
+  const NEON_MEDIDAS = { small: '60 × 45 cm', medium: '80 × 50 cm', large: '100 × 60 cm' };
+
+  function neonPrecio() {
+    if (neonTamanoActivo === 'custom') {
+      document.getElementById('neon-overlay-medida').textContent = 'Medida personalizada';
+      document.getElementById('neon-overlay-precio').textContent = 'Consultar';
+      return;
+    }
+    const base      = NEON_SIZES[neonTamanoActivo].precio;
+    const instalacion = document.getElementById('neon-instalacion').checked ? 50000 : 0;
+    const total     = base + instalacion;
+    document.getElementById('neon-overlay-medida').textContent = NEON_MEDIDAS[neonTamanoActivo];
+    document.getElementById('neon-overlay-precio').textContent = new Intl.NumberFormat('es-CO', {
+      style: 'currency', currency: 'COP', minimumFractionDigits: 0
+    }).format(total);
+  }
+
+  function neonAlign(dir) {
+    document.getElementById('neon-display').style.textAlign = dir;
+    ['left','center','right'].forEach(d =>
+      document.getElementById('align-' + d).classList.toggle('active', d === dir)
+    );
+  }
+
+  function neonWhatsapp() {
+    const texto = document.getElementById('neon-input').value.trim().replace(/\n/g, ' ');
+    const msg   = encodeURIComponent(`Hola, quiero cotizar un Neon Flex de tamaño personalizado${texto ? ' con el texto: ' + texto : ''}.`);
+    window.open(`https://wa.me/${WHATSAPP_NUM}?text=${msg}`, '_blank');
+  }
+</script>
+<footer class="nx-footer">
+  <img src="Recursos/NEXUS.png" alt="Nexus LED" class="footer-logo" />
+  <p class="footer-desc">Fabricamos avisos en acrilico iluminado, Neon Flex y señalizacion LED a medida.<br>Calidad profesional, diseño que ilumina tu marca.</p>
+  <a href="https://instagram.com/nexusled.co" target="_blank" class="footer-ig">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+    @nexusled.co
+  </a>
+  <p class="footer-copy">© 2025 Nexus LED · Todos los derechos reservados</p>
+</footer>
+
+</body>
+</html>
