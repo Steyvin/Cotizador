@@ -21,14 +21,16 @@ La sesión dura mientras el navegador esté abierto (sessionStorage). Al cerrar 
 
 ## Navegación
 
-La aplicación tiene dos vistas accesibles desde la barra de navegación fija en la parte superior:
+La aplicación tiene cuatro vistas accesibles desde la barra de navegación fija en la parte superior:
 
 | Vista | Descripción |
 |---|---|
 | **Cotizador** | Calculadora de precios para acrílico y Neon Flex |
-| **Mis Cotizaciones** | Historial de cotizaciones guardadas con datos del cliente |
+| **Cotizaciones** | Historial de cotizaciones guardadas con datos del cliente |
+| **Pedidos** | Gestión de pedidos convertidos desde cotizaciones, con pipeline de estados |
+| **Dashboard** | Resumen del negocio: totales, pedidos recientes y cotizaciones recientes |
 
-La pestaña "Mis Cotizaciones" muestra un badge con el número de cotizaciones guardadas.
+Las pestañas "Cotizaciones" y "Pedidos" muestran un badge con el número de registros activos.
 
 ---
 
@@ -175,7 +177,51 @@ Vista accesible desde la barra de navegación. Muestra todas las cotizaciones gu
 - Descripción
 - Precio cotizado
 - Botón **WhatsApp** — abre WhatsApp con el número del cliente
+- Botón **Convertir en pedido** — convierte la cotización en un pedido y lo registra en la vista Pedidos
 - Botón **Eliminar** — elimina la cotización con confirmación
+
+---
+
+## Pedidos
+
+Vista para gestionar los pedidos confirmados. Cada cotización puede convertirse en pedido desde la vista Cotizaciones.
+
+Cada tarjeta de pedido muestra:
+
+- Datos del cliente (nombre y contacto)
+- Detalle de la cotización (tipo, descripción, precio)
+- Indicador visual del paso actual en el pipeline
+- Dropdown para actualizar el estado
+- Fecha estimada de entrega
+- Botón **Eliminar** — elimina el pedido con confirmación
+
+### Pipeline de estados
+
+Los pedidos siguen un flujo de seis etapas en orden:
+
+| # | Estado |
+|---|---|
+| 1 | Pedido realizado |
+| 2 | En proceso |
+| 3 | Enviado a proveedor |
+| 4 | En fabricación |
+| 5 | Terminado |
+| 6 | Entregado |
+
+---
+
+## Dashboard
+
+Vista de resumen del negocio. Muestra cuatro métricas principales:
+
+| Métrica | Descripción |
+|---|---|
+| Total Cotizaciones | Número total de cotizaciones guardadas |
+| Total Pedidos | Número total de pedidos registrados |
+| Cotizaciones Pendientes | Cotizaciones que aún no han sido convertidas en pedido |
+| Pedidos Entregados | Pedidos en estado "Entregado" |
+
+También muestra listas de los pedidos recientes y cotizaciones recientes con acceso directo a cada vista.
 
 ---
 
@@ -186,9 +232,16 @@ Vista accesible desde la barra de navegación. Muestra todas las cotizaciones gu
 - **Tema:** Negro/blanco — fondo `#080808`, tarjetas `#111111`, texto `#f0f0f0`
 - **Animaciones CSS:** entrada del logo, scanline en el hero, aparición escalonada de elementos, pulso del logo
 - **html2canvas** (CDN) para captura de imagen del cotizador
-- **localStorage** para persistencia de cotizaciones guardadas
+- **Supabase** (CDN) como base de datos en la nube — tablas `Cotizacion` y `Pedido`
 - **sessionStorage** para mantener la sesión del login
 - **Responsive:** adaptado para móvil desde 320px
+
+### Tablas en Supabase
+
+| Tabla | Campos principales |
+|---|---|
+| `Cotizacion` | `id`, `tipo`, `nombre_cliente`, `contacto`, `descripcion`, `precio`, `imagen`, `created_at` |
+| `Pedido` | `id`, `cotizacion_id`, `estado`, `fecha_entrega`, `created_at` |
 
 ---
 
