@@ -419,16 +419,37 @@
   /* ══════════════ NAVEGACIÓN ══════════════ */
   function showView(view) {
     ;['cotizador','cotizaciones','pedidos','dashboard','control-financiero'].forEach(v => {
-      const el  = document.getElementById('view-' + v)
-      const tab = document.getElementById('tab-' + v)
-      if (el)  el.style.display = v === view ? '' : 'none'
-      if (tab) tab.classList.toggle('active', v === view)
+      const el     = document.getElementById('view-' + v)
+      const tab    = document.getElementById('tab-' + v)
+      const mobTab = document.getElementById('mob-tab-' + v)
+      if (el)     el.style.display = v === view ? '' : 'none'
+      if (tab)    tab.classList.toggle('active', v === view)
+      if (mobTab) mobTab.classList.toggle('active', v === view)
     })
     if (view === 'cotizaciones')       renderCotizaciones()
     if (view === 'pedidos')            renderPedidos()
     if (view === 'dashboard')          renderDashboard()
     if (view === 'control-financiero') renderControlFinanciero()
   }
+
+  /* ── MENÚ MOBILE ── */
+  function toggleMobileMenu() {
+    const menu = document.getElementById('nav-mobile-menu')
+    const btn  = document.getElementById('nav-hamburger')
+    const open = menu.classList.toggle('open')
+    btn.classList.toggle('open', open)
+  }
+  function closeMobileMenu() {
+    document.getElementById('nav-mobile-menu').classList.remove('open')
+    document.getElementById('nav-hamburger').classList.remove('open')
+  }
+  document.addEventListener('click', e => {
+    const menu = document.getElementById('nav-mobile-menu')
+    if (!menu || !menu.classList.contains('open')) return
+    if (!menu.contains(e.target) && !document.getElementById('nav-hamburger').contains(e.target)) {
+      closeMobileMenu()
+    }
+  })
 
   /* ══════════════ CARRITO ══════════════ */
   let _carrito = []
@@ -469,7 +490,13 @@
 
   function actualizarCarritoBadge() {
     const n = _carrito.length
+    // badge dentro del modal
     document.getElementById('carrito-badge').textContent = n
+    // botón del nav
+    const navBtn = document.getElementById('nav-cart-btn')
+    document.getElementById('nav-carrito-badge').textContent = n
+    navBtn.classList.toggle('visible', n > 0)
+    // botón flotante (oculto por CSS, pero actualizamos por si acaso)
     document.getElementById('btn-carrito-flotante').classList.toggle('visible', n > 0)
   }
 
@@ -947,9 +974,13 @@
     const { count } = await sb.from('Cotizacion')
       .select('*', { count: 'exact', head: true })
       .not('estado', 'eq', 'convertida')
-    const badge = document.getElementById('nav-badge')
-    badge.textContent  = count || 0
-    badge.style.display = count ? '' : 'none'
+    const n = count || 0
+    ;['nav-badge','mob-nav-badge'].forEach(id => {
+      const el = document.getElementById(id)
+      if (!el) return
+      el.textContent  = n
+      el.style.display = n ? '' : 'none'
+    })
   }
 
   /* ══════════════ PEDIDOS ══════════════ */
@@ -1115,10 +1146,13 @@
 
   async function actualizarBadgePedidos() {
     const { count } = await sb.from('Pedido').select('*', { count: 'exact', head: true })
-    const badge = document.getElementById('pedidos-badge')
-    if (!badge) return
-    badge.textContent  = count || 0
-    badge.style.display = count ? '' : 'none'
+    const n = count || 0
+    ;['pedidos-badge','mob-pedidos-badge'].forEach(id => {
+      const el = document.getElementById(id)
+      if (!el) return
+      el.textContent  = n
+      el.style.display = n ? '' : 'none'
+    })
   }
 
   /* ══════════════ DASHBOARD ══════════════ */
