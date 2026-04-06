@@ -1,6 +1,6 @@
 # Nexus LED — Cotizador de Avisos
 
-Herramienta interna de cotización para el negocio **Nexus LED**. Permite calcular el precio de avisos en acrílico iluminado y Neon Flex, guardar cotizaciones con datos del cliente, y consultarlas en cualquier momento.
+Herramienta interna de cotización para el negocio **Nexus LED**. Permite calcular el precio de avisos en acrílico iluminado, Neon Flex y vinilo; armar un carrito con múltiples productos; guardar cotizaciones con datos del cliente; convertirlas en pedidos; y llevar el control financiero de abonos y saldos.
 
 ---
 
@@ -9,7 +9,7 @@ Herramienta interna de cotización para el negocio **Nexus LED**. Permite calcul
 La herramienta está protegida con contraseña. Al abrir la página se muestra una pantalla de login.
 
 - **Contraseña por defecto:** `nexus2025`
-- Para cambiarla, busca en el `<script>` la línea:
+- Para cambiarla, busca en `assets/js/app.js` la línea:
   ```js
   const _PW = btoa('nexus2025');
   ```
@@ -21,14 +21,15 @@ La sesión dura mientras el navegador esté abierto (sessionStorage). Al cerrar 
 
 ## Navegación
 
-La aplicación tiene cuatro vistas accesibles desde la barra de navegación fija en la parte superior:
+La aplicación tiene cinco vistas accesibles desde la barra de navegación fija en la parte superior:
 
 | Vista | Descripción |
 |---|---|
-| **Cotizador** | Calculadora de precios para acrílico y Neon Flex |
+| **Cotizador** | Calculadora de precios para todos los tipos de aviso |
 | **Cotizaciones** | Historial de cotizaciones guardadas con datos del cliente |
 | **Pedidos** | Gestión de pedidos convertidos desde cotizaciones, con pipeline de estados |
 | **Dashboard** | Resumen del negocio: totales, pedidos recientes y cotizaciones recientes |
+| **Finanzas** | Control financiero: abonos, saldos pendientes y estado de pago por pedido |
 
 Las pestañas "Cotizaciones" y "Pedidos" muestran un badge con el número de registros activos.
 
@@ -36,7 +37,7 @@ Las pestañas "Cotizaciones" y "Pedidos" muestran un badge con el número de reg
 
 ## Tipos de aviso
 
-La calculadora maneja tres tipos seleccionables desde la parte superior:
+La calculadora maneja cinco tipos seleccionables desde la parte superior:
 
 ### 1. Nube
 Aviso en acrílico con forma rectangular continua (una sola pieza).
@@ -54,6 +55,33 @@ Letras o piezas individuales de acrílico.
 
 ### 3. Neon Flex
 Letrero luminoso de tubo neon flexible. Tiene su propia sección de configuración visual.
+
+### 4. Vinilo
+Aviso en vinilo adhesivo. El precio es **directo** (sin margen aplicado).
+
+- Se ingresan las piezas con ancho y alto en cm.
+- El precio base es `$50.000/m²`.
+- Opción de instalación: `$60.000` — automáticamente gratis si el área total supera 3 m².
+
+### 5. Acrílico
+Aviso en acrílico sin faja (tapa plana con apliques y LED opcional).
+
+**Modo regular:**
+- Base acrílico, apliques de color, cinta LED opcional (`$12.000/m`), y vinilo opcional.
+- Se aplica margen del 40%: `precio_público = costo / 0.60`.
+
+**Modo circular** (toggle):
+- Precios fijos por diámetro (sin desglose de costos):
+
+| Diámetro | Precio |
+|---|---|
+| 40 cm | $180.000 |
+| 50 cm | $220.000 |
+| 60 cm | $240.000 |
+| 70 cm | $280.000 |
+| 80 cm | $350.000 |
+
+- En modo circular, vinilo y luz LED son opciones descriptivas (no modifican el precio).
 
 ---
 
@@ -103,6 +131,8 @@ El precio público se calcula dividiendo el costo total entre 0.60, lo que aplic
 precio_público = costo_total / 0.60
 ```
 
+> **Nota:** Este margen aplica a Nube, Letra a letra y Acrílico (modo regular). Vinilo y Acrílico circular tienen precio directo.
+
 ### Colores de apliques disponibles
 
 | Color | Precio/cm² |
@@ -116,6 +146,8 @@ precio_público = costo_total / 0.60
 
 - **Precio público:** se muestra grande y destacado en la caja principal.
 - **Botón "Ver cotización detallada":** despliega el desglose interno con todos los costos individuales, costo de fabricación y ganancia. Solo para uso interno.
+  - Disponible en: Nube, Letra a letra, Acrílico (modo regular).
+  - **No disponible** en: Vinilo y Acrílico circular (precio directo, sin desglose).
 
 ---
 
@@ -150,9 +182,37 @@ Dos botones debajo del preview:
 
 ---
 
+## Carrito de cotización
+
+Permite acumular múltiples productos antes de generar una sola cotización.
+
+### Flujo
+
+1. Cotizar un producto en cualquiera de las cinco calculadoras.
+2. Pulsar **"+ Agregar al carrito"** — se muestra un toast de confirmación.
+3. El botón flotante del carrito aparece en la esquina inferior derecha con el conteo de ítems.
+4. Pulsar el botón flotante para abrir el modal del carrito.
+
+### Modal del carrito
+
+- Lista de ítems con tipo, descripción, precio y botón para eliminar individualmente.
+- **Subtotal** calculado automáticamente.
+- **Precio final editable** — se pre-llena con el subtotal pero puede modificarse manualmente para aplicar descuentos.
+- Botón **Vaciar** — elimina todos los ítems con confirmación.
+- Botón **Guardar cotización** — abre el modal de guardado con el precio del carrito y la descripción pre-llenada con los ítems.
+
+### Al guardar desde el carrito
+
+- Se guarda como tipo `"Varios"` en la base de datos.
+- La descripción incluye el resumen de todos los productos del carrito.
+- El precio guardado es el precio final editado (con posibles descuentos).
+- El carrito se vacía automáticamente después de guardar.
+
+---
+
 ## Guardar cotizaciones
 
-Al terminar de calcular, el botón **"Guardar cotización"** (disponible en acrílico y Neon Flex) abre un formulario con:
+Al terminar de calcular, el botón **"Guardar cotización"** (disponible en todas las calculadoras y en el carrito) abre un formulario con:
 
 | Campo | Descripción |
 |---|---|
@@ -162,23 +222,25 @@ Al terminar de calcular, el botón **"Guardar cotización"** (disponible en acr�
 | Contacto | WhatsApp o teléfono del cliente |
 | Descripción | Detalle libre de lo que se cotizó |
 
-Los datos se guardan en el navegador con **localStorage** — persisten aunque se cierre y vuelva a abrir la página.
+Los datos se guardan en **Supabase** (nube) y persisten aunque se cierre y vuelva a abrir la página.
 
 ---
 
 ## Mis Cotizaciones
 
-Vista accesible desde la barra de navegación. Muestra todas las cotizaciones guardadas como tarjetas con:
+Vista accesible desde la barra de navegación. Muestra todas las cotizaciones guardadas **que aún no han sido convertidas en pedido**, como tarjetas con:
 
 - Imagen del aviso cotizado
-- Tipo de aviso (Nube / Letra a letra / Neon Flex)
+- Tipo de aviso (Nube / Letra a letra / Neon Flex / Vinilo / Acrílico / Varios)
 - Fecha de guardado
 - Nombre y contacto del cliente
 - Descripción
 - Precio cotizado
 - Botón **WhatsApp** — abre WhatsApp con el número del cliente
-- Botón **Convertir en pedido** — convierte la cotización en un pedido y lo registra en la vista Pedidos
+- Botón **Convertir en pedido** — abre un modal para ingresar abono y fecha estimada de entrega, luego registra el pedido
 - Botón **Eliminar** — elimina la cotización con confirmación
+
+Incluye **barra de búsqueda** para filtrar por nombre o contacto del cliente.
 
 ---
 
@@ -195,6 +257,8 @@ Cada tarjeta de pedido muestra:
 - Fecha estimada de entrega
 - Botón **Eliminar** — elimina el pedido con confirmación
 
+Incluye **barra de búsqueda** para filtrar por nombre o contacto del cliente.
+
 ### Pipeline de estados
 
 Los pedidos siguen un flujo de seis etapas en orden:
@@ -207,6 +271,20 @@ Los pedidos siguen un flujo de seis etapas en orden:
 | 4 | En fabricación |
 | 5 | Terminado |
 | 6 | Entregado |
+
+---
+
+## Control Financiero
+
+Vista accesible desde la pestaña **Finanzas**. Muestra el estado de pago de cada pedido con:
+
+- Nombre y contacto del cliente
+- Precio total cotizado
+- Abono pagado al momento de convertir en pedido
+- Saldo pendiente
+- Badge **"Saldado"** cuando el abono cubre el total
+
+Incluye **barra de búsqueda** para filtrar por nombre o contacto.
 
 ---
 
@@ -227,8 +305,8 @@ También muestra listas de los pedidos recientes y cotizaciones recientes con ac
 
 ## Diseño y tecnología
 
-- **Un solo archivo:** `index.html` — sin frameworks, sin dependencias locales de JS
-- **Fuentes:** Rajdhani (títulos y botones) + Exo 2 (cuerpo) vía Google Fonts
+- **Estructura separada:** `index.html` (solo HTML) + `assets/css/styles.css` + `assets/js/app.js`
+- **Fuentes:** Rajdhani (títulos y botones) + Exo 2 (cuerpo) vía Google Fonts; 8 fuentes decorativas locales para Neon Flex
 - **Tema:** Negro/blanco — fondo `#080808`, tarjetas `#111111`, texto `#f0f0f0`
 - **Animaciones CSS:** entrada del logo, scanline en el hero, aparición escalonada de elementos, pulso del logo
 - **html2canvas** (CDN) para captura de imagen del cotizador
@@ -240,30 +318,39 @@ También muestra listas de los pedidos recientes y cotizaciones recientes con ac
 
 | Tabla | Campos principales |
 |---|---|
-| `Cotizacion` | `id`, `tipo`, `nombre_cliente`, `contacto`, `descripcion`, `precio`, `imagen`, `created_at` |
-| `Pedido` | `id`, `cotizacion_id`, `estado`, `fecha_entrega`, `created_at` |
+| `Cotizacion` | `id`, `tipo`, `cliente`, `contacto`, `descripcion`, `precio`, `imagen`, `estado`, `fechaCreacion` |
+| `Pedido` | `id`, `cotizacion_id`, `cliente`, `contacto`, `tipo`, `descripcion`, `precio`, `estado`, `fechaEntrega`, `abono`, `fechaPedido` |
+
+> **Nota:** El campo `abono` (numeric, default 0) debe existir en la tabla `Pedido` de Supabase para que el Control Financiero funcione correctamente.
 
 ---
 
-## Archivos del proyecto
+## Estructura de archivos
 
 ```
 /
-├── index.html              # Aplicación completa
-├── README.md               # Esta documentación
-├── Recursos/
-│   ├── NEXUS.png           # Logo blanco con fondo transparente
-│   ├── NEXUS.ico           # Favicon
-│   └── NEXUS.jpg           # Logo original
-└── fonts/
-    ├── Allanis (DEMO).ttf
-    ├── Barcelony.ttf
-    ├── Barokah Signature by Alifinart Studio.ttf
-    ├── CosmopolitanScriptRegular.otf
-    ├── Elegant DEMO.ttf
-    ├── HanleyPro-Monoline.ttf
-    ├── Hattinand.otf
-    └── Sacramento-Regular.ttf
+├── index.html                  # HTML de la aplicación
+├── README.md                   # Esta documentación
+├── assets/
+│   ├── css/
+│   │   └── styles.css          # Todos los estilos
+│   ├── js/
+│   │   └── app.js              # Toda la lógica JavaScript
+│   ├── fonts/
+│   │   ├── Allanis (DEMO).ttf
+│   │   ├── Barcelony.ttf
+│   │   ├── Barokah Signature by Alifinart Studio.ttf
+│   │   ├── CosmopolitanScriptRegular.otf
+│   │   ├── Elegant DEMO.ttf
+│   │   ├── HanleyPro-Monoline.ttf
+│   │   ├── Hattinand.otf
+│   │   └── Sacramento-Regular.ttf
+│   └── img/
+│       ├── NEXUS.png           # Logo blanco con fondo transparente
+│       ├── NEXUS.ico           # Favicon
+│       └── NEXUS.jpg           # Logo original
+├── manifest.json               # Configuración PWA
+└── sw.js                       # Service Worker (PWA offline)
 ```
 
 ---
