@@ -1693,6 +1693,184 @@
       color: var(--muted);
       margin-top: 5px;
     }
+
+    /* ── CARRITO ──────────────────────────────────────── */
+    .btn-add-carrito {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      width: 100%;
+      padding: 13px 18px;
+      background: #0d2b0d;
+      border: 1px solid #1e5c1e;
+      border-radius: var(--radius);
+      color: #5eba5e;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: .95rem;
+      font-weight: 600;
+      letter-spacing: .4px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background .18s, border-color .18s, color .18s;
+    }
+    .btn-add-carrito:hover { background: #122b12; border-color: #2d7a2d; color: #7fd67f; }
+
+    #btn-carrito-flotante {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: #163516;
+      border: 1px solid #2d7a2d;
+      border-radius: 30px;
+      color: #7fd67f;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      z-index: 900;
+      box-shadow: 0 4px 18px rgba(0,0,0,.5);
+      transition: background .18s, transform .1s;
+    }
+    #btn-carrito-flotante:hover { background: #1c4a1c; transform: translateY(-2px); }
+    #btn-carrito-flotante.visible { display: flex; }
+
+    #carrito-badge {
+      background: #5eba5e;
+      color: #0a0a0a;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .8rem;
+      font-weight: 700;
+    }
+
+    #modal-carrito .modal-box { max-width: 520px; }
+
+    .carrito-lista { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .carrito-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: #161616;
+      border: 1px solid #222;
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+    .carrito-item-info { flex: 1; min-width: 0; }
+    .carrito-item-tipo { font-size: .75rem; color: var(--muted); margin-bottom: 2px; text-transform: uppercase; letter-spacing: .5px; }
+    .carrito-item-desc { font-size: .9rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .carrito-item-precio { font-family: 'Rajdhani', sans-serif; font-size: 1rem; font-weight: 700; color: var(--brand); white-space: nowrap; }
+    .carrito-item-del {
+      background: transparent;
+      border: 1px solid #333;
+      border-radius: 6px;
+      color: #888;
+      font-size: .85rem;
+      padding: 4px 8px;
+      cursor: pointer;
+      transition: border-color .15s, color .15s;
+    }
+    .carrito-item-del:hover { border-color: #c44; color: #e55; }
+
+    .carrito-subtotal {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-top: 1px solid #222;
+      border-bottom: 1px solid #222;
+      margin-bottom: 16px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+      color: var(--muted);
+    }
+    .carrito-subtotal strong { color: var(--text); font-size: 1.1rem; }
+
+    .carrito-precio-final { margin-bottom: 18px; }
+    .carrito-precio-final label {
+      display: block;
+      font-size: .8rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .carrito-precio-final input {
+      width: 100%;
+      box-sizing: border-box;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .carrito-precio-final input:focus { border-color: var(--brand); }
+    .carrito-precio-hint { font-size: .75rem; color: var(--muted); margin-top: 5px; }
+
+    .carrito-actions { display: flex; gap: 10px; }
+    .btn-vaciar-carrito {
+      flex: 0 0 auto;
+      padding: 11px 16px;
+      background: transparent;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #888;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color .15s, color .15s;
+    }
+    .btn-vaciar-carrito:hover { border-color: #c44; color: #e55; }
+    .btn-guardar-carrito {
+      flex: 1;
+      padding: 11px 16px;
+      background: var(--brand);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: .4px;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    .btn-guardar-carrito:hover { opacity: .88; }
+
+    #carrito-toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #163516;
+      border: 1px solid #2d7a2d;
+      color: #7fd67f;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: .95rem;
+      font-weight: 600;
+      padding: 10px 22px;
+      border-radius: 30px;
+      z-index: 1100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s, transform .25s;
+    }
+    #carrito-toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
@@ -2047,7 +2225,7 @@
   <div id="precio-cliente">
     <div class="pc-label">Valor del aviso</div>
     <div class="pc-monto" id="v_publico">$0</div>
-    <button class="btn-detalle" onclick="toggleDetalle()">Ver cotizacion detallada ↓</button>
+    <button id="btn-detalle-regular" class="btn-detalle" onclick="toggleDetalle()">Ver cotizacion detallada ↓</button>
   </div>
 
   <!-- DETALLE -->
@@ -2075,6 +2253,10 @@
   <button class="btn-save-cotizacion" onclick="abrirModalGuardar()">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
     Guardar cotización
+  </button>
+  <button class="btn-add-carrito" onclick="agregarAlCarrito()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    + Agregar al carrito
   </button>
   </div><!-- /calc-regular -->
 
@@ -2254,6 +2436,10 @@
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
       Guardar cotización
     </button>
+    <button class="btn-add-carrito" onclick="agregarAlCarrito()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      + Agregar al carrito
+    </button>
   </div><!-- /calc-neon -->
 
   <!-- ══════════ CALC: VINILO ══════════ -->
@@ -2317,17 +2503,6 @@
     <div id="vinilo-precio">
       <div class="pc-label">Valor del aviso</div>
       <div class="pc-monto" id="vinilo_v_publico">$0</div>
-      <button class="btn-detalle" onclick="toggleDetalleVinilo()">Ver cotización detallada ↓</button>
-    </div>
-
-    <!-- Detalle vinilo -->
-    <div id="vinilo-detalle">
-      <h3>Desglose de costos</h3>
-      <div class="detalle-item"><span class="nombre">Vinilo</span><span class="valor" id="vd_vinilo">$0</span></div>
-      <div class="detalle-item"><span class="nombre">Instalación</span><span class="valor" id="vd_inst">$0</span></div>
-      <div class="detalle-subtotales">
-        <div class="row fabricacion"><span>Precio final</span><span class="val" id="vd_total">$0</span></div>
-      </div>
     </div>
 
     <div class="btn-row">
@@ -2336,6 +2511,10 @@
     <button class="btn-save-cotizacion" onclick="abrirModalGuardar()">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
       Guardar cotización
+    </button>
+    <button class="btn-add-carrito" onclick="agregarAlCarrito()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      + Agregar al carrito
     </button>
   </div><!-- /calc-vinilo -->
 
@@ -2470,7 +2649,48 @@
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
       Guardar cotización
     </button>
+    <button class="btn-add-carrito" onclick="agregarAlCarrito()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      + Agregar al carrito
+    </button>
   </div><!-- /calc-acrilio -->
+
+<!-- BOTÓN FLOTANTE CARRITO -->
+<button id="btn-carrito-flotante" onclick="abrirCarrito()">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+  Carrito <span id="carrito-badge">0</span>
+</button>
+
+<!-- TOAST CARRITO -->
+<div id="carrito-toast">✓ Producto agregado al carrito</div>
+
+<!-- MODAL CARRITO -->
+<div id="modal-carrito" class="modal-overlay" onclick="if(event.target===this)cerrarCarrito()">
+  <div class="modal-box">
+    <button class="modal-close" onclick="cerrarCarrito()">✕</button>
+    <h2 class="modal-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      Carrito de cotización
+    </h2>
+    <div id="carrito-lista" class="carrito-lista"></div>
+    <div class="carrito-subtotal">
+      <span>Subtotal</span>
+      <strong id="carrito-subtotal-val">$0</strong>
+    </div>
+    <div class="carrito-precio-final">
+      <label>Precio final (edita para aplicar descuento)</label>
+      <input type="number" id="carrito-precio-input" placeholder="0" min="0" step="1000" oninput="sincronizarPrecioCarrito()" />
+      <div class="carrito-precio-hint">Puedes modificar el precio antes de guardar la cotización</div>
+    </div>
+    <div class="carrito-actions">
+      <button class="btn-vaciar-carrito" onclick="vaciarCarrito()">Vaciar</button>
+      <button class="btn-guardar-carrito" onclick="guardarDesdeCarrito()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:6px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Guardar cotización
+      </button>
+    </div>
+  </div>
+</div>
 
 </main>
 
@@ -2687,7 +2907,7 @@
     return new Date(iso).toLocaleDateString('es-CO', { day:'2-digit', month:'short' })
   }
 
-  const TIPO_LABEL = { nube: 'Nube', letra: 'Letra a letra', neon: 'Neon Flex', vinilo: 'Vinilo', acrilio: 'Acrílico' }
+  const TIPO_LABEL = { nube: 'Nube', letra: 'Letra a letra', neon: 'Neon Flex', vinilo: 'Vinilo', acrilio: 'Acrílico', carrito: 'Varios' }
 
   /* ══════════════ COTIZADOR ══════════════ */
   let tipoActivo = 'nube'
@@ -2902,7 +3122,7 @@
   }
   function toggleDetalle() {
     const panel   = document.getElementById('detalle-panel')
-    const btn     = document.querySelector('.btn-detalle')
+    const btn     = document.getElementById('btn-detalle-regular')
     const visible = panel.classList.toggle('visible')
     btn.textContent = visible ? 'Ocultar detalle ↑' : 'Ver cotizacion detallada ↓'
   }
@@ -2924,7 +3144,7 @@
     document.getElementById('estructura_manual').value = ''
     document.getElementById('mdo_manual').value = ''
     document.getElementById('detalle-panel').classList.remove('visible')
-    document.querySelector('.btn-detalle').textContent = 'Ver cotizacion detallada ↓'
+    document.getElementById('btn-detalle-regular').textContent = 'Ver cotizacion detallada ↓'
     calcular()
   }
 
@@ -3092,6 +3312,122 @@
     if (view === 'control-financiero') renderControlFinanciero()
   }
 
+  /* ══════════════ CARRITO ══════════════ */
+  let _carrito = []
+  let _precioGuardar = 0
+  let _guardarDesdeCarrito = false
+
+  function agregarAlCarrito() {
+    const precioElMap = { neon: 'neon-overlay-precio', vinilo: 'vinilo_v_publico', acrilio: 'acr_v_publico' }
+    const elId = precioElMap[tipoActivo] || 'v_publico'
+    const txt  = document.getElementById(elId).textContent
+    const precio = parseInt(txt.replace(/\D/g, '')) || 0
+    if (!precio) { alert('El precio es $0 — configura el aviso primero.'); return }
+
+    let desc = TIPO_LABEL[tipoActivo] || tipoActivo
+    if (tipoActivo === 'nube' || tipoActivo === 'letra') {
+      const ancho = document.getElementById('tapa_ancho').value
+      const alto  = document.getElementById('tapa_alto').value
+      if (ancho && alto) desc += ` · ${ancho}×${alto} cm`
+    } else if (tipoActivo === 'neon') {
+      const tamano = { small: 'Pequeño', medium: 'Mediano', large: 'Grande' }[neonTamanoActivo] || ''
+      if (tamano) desc += ` · ${tamano}`
+    } else if (tipoActivo === 'acrilio') {
+      const esCirc = document.getElementById('acr_circular_check').checked
+      if (esCirc) {
+        const btn = document.querySelector('.diametro-btn.active')
+        if (btn) desc += ` circular Ø${btn.dataset.diametro} cm`
+      } else {
+        const ancho = document.getElementById('acr_ancho').value
+        const alto  = document.getElementById('acr_alto').value
+        if (ancho && alto) desc += ` · ${ancho}×${alto} cm`
+      }
+    }
+
+    _carrito.push({ id: Date.now(), tipoLabel: TIPO_LABEL[tipoActivo] || tipoActivo, desc, precio })
+    actualizarCarritoBadge()
+    mostrarToastCarrito()
+  }
+
+  function actualizarCarritoBadge() {
+    const n = _carrito.length
+    document.getElementById('carrito-badge').textContent = n
+    document.getElementById('btn-carrito-flotante').classList.toggle('visible', n > 0)
+  }
+
+  let _toastTimer = null
+  function mostrarToastCarrito() {
+    const toast = document.getElementById('carrito-toast')
+    toast.classList.add('visible')
+    clearTimeout(_toastTimer)
+    _toastTimer = setTimeout(() => toast.classList.remove('visible'), 2000)
+  }
+
+  function abrirCarrito() {
+    renderCarrito()
+    document.getElementById('modal-carrito').classList.add('visible')
+  }
+
+  function cerrarCarrito() {
+    document.getElementById('modal-carrito').classList.remove('visible')
+  }
+
+  function renderCarrito() {
+    const lista    = document.getElementById('carrito-lista')
+    const subtotal = _carrito.reduce((s, i) => s + i.precio, 0)
+    lista.innerHTML = _carrito.length
+      ? _carrito.map(item => `
+          <div class="carrito-item">
+            <div class="carrito-item-info">
+              <div class="carrito-item-tipo">${item.tipoLabel}</div>
+              <div class="carrito-item-desc">${item.desc}</div>
+            </div>
+            <span class="carrito-item-precio">${fmt(item.precio)}</span>
+            <button class="carrito-item-del" onclick="eliminarDeCarrito(${item.id})">✕</button>
+          </div>`).join('')
+      : '<p style="color:var(--muted);text-align:center;padding:20px 0;">El carrito está vacío</p>'
+
+    document.getElementById('carrito-subtotal-val').textContent = fmt(subtotal)
+    const inp = document.getElementById('carrito-precio-input')
+    if (!inp.dataset.editado || !_carrito.length) {
+      inp.value = subtotal
+      inp.dataset.editado = ''
+    }
+  }
+
+  function eliminarDeCarrito(id) {
+    _carrito = _carrito.filter(i => i.id !== id)
+    actualizarCarritoBadge()
+    document.getElementById('carrito-precio-input').dataset.editado = ''
+    renderCarrito()
+  }
+
+  function sincronizarPrecioCarrito() {
+    document.getElementById('carrito-precio-input').dataset.editado = '1'
+  }
+
+  function vaciarCarrito() {
+    if (!confirm('¿Vaciar el carrito?')) return
+    _carrito = []
+    const inp = document.getElementById('carrito-precio-input')
+    inp.value = ''
+    inp.dataset.editado = ''
+    actualizarCarritoBadge()
+    cerrarCarrito()
+  }
+
+  async function guardarDesdeCarrito() {
+    if (!_carrito.length) { alert('El carrito está vacío.'); return }
+    const inp = document.getElementById('carrito-precio-input')
+    const precio = parseInt(inp.value) || _carrito.reduce((s, i) => s + i.precio, 0)
+    _precioGuardar = precio
+    _guardarDesdeCarrito = true
+    const descItems = _carrito.map(i => i.desc).join(' + ')
+    cerrarCarrito()
+    await abrirModalGuardar()
+    document.getElementById('save-desc').value = descItems
+  }
+
   /* ══════════════ MODAL GUARDAR ══════════════ */
   let _imgDataGuardar = null
 
@@ -3144,13 +3480,18 @@
     const contacto    = document.getElementById('save-contacto').value.trim()
     const descripcion = document.getElementById('save-desc').value.trim()
 
-    const precioElMap = {
-      neon:    'neon-overlay-precio',
-      vinilo:  'vinilo_v_publico',
-      acrilio: 'acr_v_publico',
+    let precioNum
+    if (_guardarDesdeCarrito && _precioGuardar) {
+      precioNum = _precioGuardar
+    } else {
+      const precioElMap = {
+        neon:    'neon-overlay-precio',
+        vinilo:  'vinilo_v_publico',
+        acrilio: 'acr_v_publico',
+      }
+      const precioEl = document.getElementById(precioElMap[tipoActivo] || 'v_publico').textContent
+      precioNum = parseInt(precioEl.replace(/\D/g,'')) || 0
     }
-    const precioEl  = document.getElementById(precioElMap[tipoActivo] || 'v_publico').textContent
-    const precioNum = parseInt(precioEl.replace(/\D/g,'')) || 0
 
     const btnSave = document.querySelector('.btn-modal-save')
     const origTxt = btnSave.innerHTML
@@ -3158,7 +3499,7 @@
     btnSave.textContent = 'Guardando…'
 
     const { error } = await sb.from('Cotizacion').insert({
-      tipo:        tipoActivo,
+      tipo:        _guardarDesdeCarrito ? 'carrito' : tipoActivo,
       cliente:     cliente || 'Sin nombre',
       contacto:    contacto || null,
       descripcion: descripcion || null,
@@ -3171,6 +3512,13 @@
     btnSave.innerHTML = origTxt
 
     if (error) { alert('Error al guardar: ' + error.message); return }
+
+    if (_guardarDesdeCarrito) {
+      _carrito = []
+      _guardarDesdeCarrito = false
+      _precioGuardar = 0
+      actualizarCarritoBadge()
+    }
 
     await actualizarBadge()
     cerrarModalGuardar()
@@ -3253,16 +3601,6 @@
     const precioFinal = costoVinilo + costoInst
 
     document.getElementById('vinilo_v_publico').textContent = fmt(precioFinal)
-    document.getElementById('vd_vinilo').textContent  = fmt(costoVinilo)
-    document.getElementById('vd_inst').textContent    = fmt(costoInst)
-    document.getElementById('vd_total').textContent   = fmt(precioFinal)
-  }
-
-  function toggleDetalleVinilo() {
-    const panel   = document.getElementById('vinilo-detalle')
-    const btn     = document.querySelector('#calc-vinilo .btn-detalle')
-    const visible = panel.classList.toggle('visible')
-    btn.textContent = visible ? 'Ocultar detalle ↑' : 'Ver cotización detallada ↓'
   }
 
   function limpiarVinilo() {
