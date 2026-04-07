@@ -856,23 +856,27 @@
 <!-- TOAST CARRITO -->
 <div id="carrito-toast">✓ Producto agregado al carrito</div>
 
-<!-- MODAL CARRITO -->
-<div id="modal-carrito" class="modal-overlay" onclick="if(event.target===this)cerrarCarrito()">
-  <div class="modal-box">
-    <button class="modal-close" onclick="cerrarCarrito()">✕</button>
-    <h2 class="modal-title">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-      Carrito de cotización
-    </h2>
-    <div id="carrito-lista" class="carrito-lista"></div>
+<!-- DRAWER CARRITO -->
+<div id="carrito-backdrop" onclick="cerrarCarrito()"></div>
+<div id="carrito-drawer">
+  <div class="carrito-drawer-header">
+    <div class="carrito-drawer-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      Carrito
+      <span class="carrito-drawer-count" id="carrito-badge">0</span>
+    </div>
+    <button class="carrito-drawer-close" onclick="cerrarCarrito()">✕</button>
+  </div>
+  <div id="carrito-lista" class="carrito-lista"></div>
+  <div class="carrito-drawer-footer">
     <div class="carrito-subtotal">
       <span>Subtotal</span>
       <strong id="carrito-subtotal-val">$0</strong>
     </div>
     <div class="carrito-precio-final">
-      <label>Precio final (edita para aplicar descuento)</label>
+      <label>Precio final <span style="color:var(--muted);font-weight:400;">(edita para aplicar descuento)</span></label>
       <input type="number" id="carrito-precio-input" placeholder="0" min="0" step="1000" oninput="sincronizarPrecioCarrito()" />
-      <div class="carrito-precio-hint">Puedes modificar el precio antes de guardar la cotización</div>
+      <div class="carrito-precio-hint">Modifica el precio total antes de guardar</div>
     </div>
     <div class="carrito-actions">
       <button class="btn-vaciar-carrito" onclick="vaciarCarrito()">Vaciar</button>
@@ -1034,6 +1038,82 @@
   </div>
 </div>
 
+<!-- MODAL: DETALLE CARRITO -->
+<div class="modal-overlay" id="modal-detalle-carrito" onclick="if(event.target===this)cerrarDetalleCarrito()">
+  <div class="modal-box" style="max-width:460px;">
+    <div class="modal-header">
+      <h3>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Detalle de productos
+      </h3>
+      <button class="modal-close" onclick="cerrarDetalleCarrito()">✕</button>
+    </div>
+    <div class="detalle-cot-cliente" id="detalle-cot-cliente"></div>
+    <div id="detalle-cot-lista" class="detalle-cot-lista"></div>
+    <p id="detalle-cot-nota" class="detalle-cot-nota"></p>
+    <div class="detalle-cot-totales">
+      <div class="detalle-cot-fila">
+        <span>Subtotal</span>
+        <span id="detalle-cot-subtotal"></span>
+      </div>
+      <div class="detalle-cot-fila" id="detalle-cot-fila-descuento">
+        <span>Precio con descuento</span>
+        <strong id="detalle-cot-final" style="color:#4da74d;"></strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DRAWER: EDITAR COTIZACIÓN -->
+<div id="cot-edit-backdrop" onclick="cerrarEditCotizacion()"></div>
+<div id="cot-edit-drawer">
+  <div class="carrito-drawer-header">
+    <div class="carrito-drawer-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Editar cotización
+    </div>
+    <button class="carrito-drawer-close" onclick="cerrarEditCotizacion()">✕</button>
+  </div>
+  <div id="cot-edit-lista" class="carrito-lista"></div>
+  <div class="carrito-drawer-footer">
+    <div class="field" style="margin-bottom:14px;">
+      <label style="font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;font-weight:700;color:var(--text);display:block;margin-bottom:6px;">Nota adicional</label>
+      <textarea id="cot-edit-nota" rows="2" style="width:100%;box-sizing:border-box;background:#111;border:1px solid #333;border-radius:8px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:.9rem;padding:8px 12px;outline:none;resize:none;" placeholder="Comentario opcional…"></textarea>
+    </div>
+    <div class="carrito-subtotal">
+      <span>Subtotal productos</span>
+      <strong id="cot-edit-subtotal">$0</strong>
+    </div>
+    <div class="carrito-precio-final">
+      <label>Precio final al cliente</label>
+      <input type="number" id="cot-edit-precio" placeholder="0" min="0" step="1000"
+        oninput="document.getElementById('cot-edit-precio').dataset.editado='1'" />
+    </div>
+    <div class="carrito-actions">
+      <button class="btn-vaciar-carrito" onclick="cerrarEditCotizacion()">Cancelar</button>
+      <button class="btn-guardar-carrito" onclick="guardarEdicionCotizacion()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:6px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Guardar cambios
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: DETALLE PRODUCCIÓN PEDIDO -->
+<div class="modal-overlay" id="modal-detalle-pedido" onclick="if(event.target===this)cerrarDetallePedido()">
+  <div class="modal-box" style="max-width:480px;">
+    <div class="modal-header">
+      <h3>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        Estado de producción
+      </h3>
+      <button class="modal-close" onclick="cerrarDetallePedido()">✕</button>
+    </div>
+    <div class="detalle-cot-cliente" id="detalle-ped-cliente"></div>
+    <div id="detalle-ped-lista"></div>
+  </div>
+</div>
+
 <!-- MODAL: GUARDAR COTIZACION -->
 <div class="modal-overlay" id="modal-guardar">
   <div class="modal-box">
@@ -1057,8 +1137,8 @@
       <label>Contacto (WhatsApp o teléfono)</label>
       <input type="text" id="save-contacto" placeholder="Ej: 3201234567" />
     </div>
-    <div class="field">
-      <label>Descripción</label>
+    <div class="field" id="save-desc-field">
+      <label id="save-desc-label">Descripción</label>
       <textarea id="save-desc" rows="3" placeholder="Ej: Aviso nube 80×60 cm, acrílico blanco, vinilo e instalación…" style="resize:vertical;"></textarea>
     </div>
     <div class="modal-actions">

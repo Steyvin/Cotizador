@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ':*)",
+      "Bash(npm list:*)",
+      "Bash(node generar_plan.js)",
+      "Bash(node:*)",
+      "Bash(npx sv:*)",
+      "Bash(npx sv@latest create nexus-erp --template minimal --types ts --no-prettier --no-eslint)",
+      "Bash(npx sv@latest create nexus-erp --template minimal --types ts --add tailwindcss=\"plugins:none\" prettier --install npm)",
+      "Bash(npm install:*)",
+      "Bash(mkdir:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx svelte-kit:*)",
+      "Bash(rm -rf \"C:/Users/steyv/OneDrive/Documentos/PROYECTOS/nexus-erp/src/routes/cotizaciones/[id\")",
+      "Bash(rm -rf \"C:/Users/steyv/OneDrive/Documentos/PROYECTOS/nexus-erp/src/routes/pedidos/[id\")",
+      "Bash(mkdir -p \"C:/Users/steyv/OneDrive/Documentos/PROYECTOS/nexus-erp/src/routes/cotizaciones/[id]\")",
+      "Bash(mkdir -p \"C:/Users/steyv/OneDrive/Documentos/PROYECTOS/nexus-erp/src/routes/pedidos/[id]\")"
+    ]
+  }
+}

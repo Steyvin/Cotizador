@@ -455,6 +455,9 @@
   let _carrito = []
   let _precioGuardar = 0
   let _guardarDesdeCarrito = false
+  let _carritoItemsGuardar = null
+  let _editCotId   = null
+  let _editCotItems = []
 
   function agregarAlCarrito() {
     const precioElMap = { neon: 'neon-overlay-precio', vinilo: 'vinilo_v_publico', acrilio: 'acr_v_publico' }
@@ -462,6 +465,15 @@
     const txt  = document.getElementById(elId).textContent
     const precio = parseInt(txt.replace(/\D/g, '')) || 0
     if (!precio) { alert('El precio es $0 — configura el aviso primero.'); return }
+
+    // Capturar costo de fabricación para productos con margen (nube, letra, acrilio)
+    const costoElMap = { nube: 'v_total', letra: 'v_total', acrilio: 'acrd_total' }
+    const costoElId  = costoElMap[tipoActivo]
+    let costo = null
+    if (costoElId) {
+      const costoEl = document.getElementById(costoElId)
+      if (costoEl) costo = parseInt(costoEl.textContent.replace(/\D/g,'')) || null
+    }
 
     let desc = TIPO_LABEL[tipoActivo] || tipoActivo
     if (tipoActivo === 'nube' || tipoActivo === 'letra') {
@@ -483,7 +495,7 @@
       }
     }
 
-    _carrito.push({ id: Date.now(), tipoLabel: TIPO_LABEL[tipoActivo] || tipoActivo, desc, precio })
+    _carrito.push({ id: Date.now(), tipoLabel: TIPO_LABEL[tipoActivo] || tipoActivo, desc, precio, costo })
     actualizarCarritoBadge()
     mostrarToastCarrito()
   }
@@ -510,11 +522,13 @@
 
   function abrirCarrito() {
     renderCarrito()
-    document.getElementById('modal-carrito').classList.add('visible')
+    document.getElementById('carrito-drawer').classList.add('visible')
+    document.getElementById('carrito-backdrop').classList.add('visible')
   }
 
   function cerrarCarrito() {
-    document.getElementById('modal-carrito').classList.remove('visible')
+    document.getElementById('carrito-drawer').classList.remove('visible')
+    document.getElementById('carrito-backdrop').classList.remove('visible')
   }
 
   function renderCarrito() {
@@ -523,20 +537,40 @@
     lista.innerHTML = _carrito.length
       ? _carrito.map(item => `
           <div class="carrito-item">
-            <div class="carrito-item-info">
-              <div class="carrito-item-tipo">${item.tipoLabel}</div>
-              <div class="carrito-item-desc">${item.desc}</div>
+            <div class="carrito-item-top">
+              <div class="carrito-item-info">
+                <div class="carrito-item-tipo">${item.tipoLabel}</div>
+                <div class="carrito-item-desc">${item.desc}</div>
+              </div>
+              <button class="carrito-item-del" onclick="eliminarDeCarrito(${item.id})">✕</button>
             </div>
-            <span class="carrito-item-precio">${fmt(item.precio)}</span>
-            <button class="carrito-item-del" onclick="eliminarDeCarrito(${item.id})">✕</button>
+            <div class="carrito-item-bottom">
+              <span class="carrito-item-precio-label">Precio</span>
+              <input class="carrito-item-precio-input" type="number" value="${item.precio}" min="0" step="1000"
+                onchange="actualizarPrecioItem(${item.id}, this.value)" />
+            </div>
           </div>`).join('')
-      : '<p style="color:var(--muted);text-align:center;padding:20px 0;">El carrito está vacío</p>'
+      : '<p style="color:var(--muted);text-align:center;padding:30px 0;">El carrito está vacío</p>'
 
     document.getElementById('carrito-subtotal-val').textContent = fmt(subtotal)
     const inp = document.getElementById('carrito-precio-input')
     if (!inp.dataset.editado || !_carrito.length) {
       inp.value = subtotal
       inp.dataset.editado = ''
+    }
+  }
+
+  function actualizarPrecioItem(id, val) {
+    const precio = parseInt(val) || 0
+    const item = _carrito.find(i => i.id === id)
+    if (item) {
+      item.precio = precio
+      const subtotal = _carrito.reduce((s, i) => s + i.precio, 0)
+      document.getElementById('carrito-subtotal-val').textContent = fmt(subtotal)
+      const inp = document.getElementById('carrito-precio-input')
+      if (!inp.dataset.editado) {
+        inp.value = subtotal
+      }
     }
   }
 
@@ -567,10 +601,10 @@
     const precio = parseInt(inp.value) || _carrito.reduce((s, i) => s + i.precio, 0)
     _precioGuardar = precio
     _guardarDesdeCarrito = true
-    const descItems = _carrito.map(i => i.desc).join(' + ')
+    _carritoItemsGuardar = _carrito.map(i => ({ tipoLabel: i.tipoLabel, desc: i.desc, precio: i.precio }))
     cerrarCarrito()
     await abrirModalGuardar()
-    document.getElementById('save-desc').value = descItems
+    document.getElementById('save-desc').value = ''
   }
 
   /* ══════════════ MODAL GUARDAR ══════════════ */
@@ -596,6 +630,17 @@
     document.getElementById('save-img-file').value = ''
     document.getElementById('upload-label-txt').textContent = 'Subir imagen desde el PC (opcional)'
     document.getElementById('modal-img-preview').innerHTML = '<span>Capturando vista previa…</span>'
+
+    const descLabel = document.getElementById('save-desc-label')
+    const descTA    = document.getElementById('save-desc')
+    if (_guardarDesdeCarrito) {
+      descLabel.textContent = 'Nota adicional (opcional)'
+      descTA.placeholder    = 'Ej: incluye instalación, entrega a domicilio…'
+    } else {
+      descLabel.textContent = 'Descripción'
+      descTA.placeholder    = 'Ej: Aviso nube 80×60 cm, acrílico blanco, vinilo e instalación…'
+    }
+
     document.getElementById('modal-guardar').classList.add('visible')
 
     try {
@@ -643,11 +688,16 @@
     btnSave.disabled = true
     btnSave.textContent = 'Guardando…'
 
+    let descripcionFinal = descripcion || null
+    if (_guardarDesdeCarrito && _carritoItemsGuardar?.length) {
+      descripcionFinal = JSON.stringify({ items: _carritoItemsGuardar, nota: descripcion || '' })
+    }
+
     const { error } = await sb.from('Cotizacion').insert({
       tipo:        _guardarDesdeCarrito ? 'carrito' : tipoActivo,
       cliente:     cliente || 'Sin nombre',
       contacto:    contacto || null,
-      descripcion: descripcion || null,
+      descripcion: descripcionFinal,
       precio:      precioNum,
       imagen:      _imgDataGuardar || null,
       estado:      'pendiente'
@@ -662,6 +712,7 @@
       _carrito = []
       _guardarDesdeCarrito = false
       _precioGuardar = 0
+      _carritoItemsGuardar = null
       actualizarCarritoBadge()
     }
 
@@ -915,6 +966,26 @@
 
     listEl.innerHTML = lista.map(q => {
       const fecha = fmtFecha(q.fechaCreacion)
+
+      // Detectar si el campo descripcion contiene items JSON del carrito
+      let parsedCart = null
+      if (q.tipo === 'carrito' && q.descripcion) {
+        try {
+          const p = JSON.parse(q.descripcion)
+          if (Array.isArray(p.items)) parsedCart = p
+        } catch {}
+      }
+
+      let descHtml
+      if (parsedCart) {
+        const n = parsedCart.items.length
+        descHtml = `<div class="cot-desc cot-desc-items">${n} producto${n !== 1 ? 's' : ''} · ${parsedCart.items.map(i => i.tipoLabel).join(', ')}</div>`
+      } else if (q.descripcion) {
+        descHtml = `<div class="cot-desc">${escHtml(q.descripcion)}</div>`
+      } else {
+        descHtml = `<div class="cot-desc" style="opacity:.35">Sin descripción</div>`
+      }
+
       return `
         <div class="cot-card" id="cot-${q.id}">
           <div class="cot-card-img">
@@ -927,9 +998,18 @@
             </div>
             <div class="cot-cliente">${escHtml(q.cliente)}</div>
             ${q.contacto ? `<div class="cot-contacto">📱 ${escHtml(q.contacto)}</div>` : ''}
-            ${q.descripcion ? `<div class="cot-desc">${escHtml(q.descripcion)}</div>` : '<div class="cot-desc" style="opacity:.35">Sin descripción</div>'}
+            ${descHtml}
             <div class="cot-precio">${fmt(q.precio)}</div>
             <div class="cot-card-actions">
+              ${parsedCart ? `
+                <button class="cot-btn-detalle" onclick="verDetalleCotizacion(${q.id})">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                  Ver detalle
+                </button>
+                <button class="cot-btn-editar" onclick="editarCotizacion(${q.id})">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  Editar
+                </button>` : ''}
               ${q.contacto ? `
                 <button class="cot-btn-wa" onclick="contactarCliente('${escAttr(q.contacto)}','${escAttr(q.cliente)}')">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.523 5.847L0 24l6.335-1.499A11.934 11.934 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.891 0-3.659-.5-5.188-1.373l-.371-.22-3.762.89.938-3.65-.242-.381A9.96 9.96 0 0 1 2 12C2 6.478 6.478 2 12 2s10 4.478 10 10-4.478 10-10 10z"/></svg>
@@ -952,6 +1032,131 @@
   function filtrarCotizaciones() {
     const q = document.getElementById('cot-search').value.trim()
     pintarCotizaciones(q)
+  }
+
+  function verDetalleCotizacion(cotId) {
+    const cot = _cotizacionesData.find(c => c.id === cotId)
+    if (!cot) return
+    let parsedCart
+    try { parsedCart = JSON.parse(cot.descripcion) } catch { return }
+    if (!Array.isArray(parsedCart.items)) return
+
+    const { items, nota } = parsedCart
+    const subtotal = items.reduce((s, i) => s + i.precio, 0)
+
+    document.getElementById('detalle-cot-cliente').textContent = cot.cliente || 'Sin nombre'
+    document.getElementById('detalle-cot-lista').innerHTML = items.map(item => `
+      <div class="detalle-item">
+        <div class="detalle-item-info">
+          <div class="detalle-item-tipo">${escHtml(item.tipoLabel)}</div>
+          <div class="detalle-item-desc">${escHtml(item.desc)}</div>
+        </div>
+        <div class="detalle-item-precios">
+          ${item.costo != null ? `
+            <div class="detalle-precio-row">
+              <span class="detalle-precio-label">Fabricación</span>
+              <span class="detalle-precio-val costo-val">${fmt(item.costo)}</span>
+            </div>
+            <div class="detalle-precio-row">
+              <span class="detalle-precio-label">Al cliente</span>
+              <span class="detalle-precio-val pub-val">${fmt(item.precio)}</span>
+            </div>` : `
+            <div class="detalle-precio-row">
+              <span class="detalle-precio-label">Precio fijo</span>
+              <span class="detalle-precio-val pub-val">${fmt(item.precio)}</span>
+            </div>`}
+        </div>
+      </div>`).join('')
+
+    const notaEl = document.getElementById('detalle-cot-nota')
+    notaEl.textContent = nota || ''
+    notaEl.style.display = nota ? '' : 'none'
+
+    document.getElementById('detalle-cot-subtotal').textContent = fmt(subtotal)
+    document.getElementById('detalle-cot-final').textContent = fmt(cot.precio)
+    const filaDesc = document.getElementById('detalle-cot-fila-descuento')
+    filaDesc.style.display = (cot.precio !== subtotal) ? '' : 'none'
+
+    document.getElementById('modal-detalle-carrito').classList.add('visible')
+  }
+
+  function cerrarDetalleCarrito() {
+    document.getElementById('modal-detalle-carrito').classList.remove('visible')
+  }
+
+  // ── Editar cotización ──────────────────────────────
+  function editarCotizacion(cotId) {
+    const cot = _cotizacionesData.find(c => c.id === cotId)
+    if (!cot) return
+    let parsedCart
+    try { parsedCart = JSON.parse(cot.descripcion) } catch { return }
+    if (!Array.isArray(parsedCart.items)) return
+
+    _editCotId    = cotId
+    _editCotItems = parsedCart.items.map(i => ({ ...i }))
+
+    document.getElementById('cot-edit-nota').value     = parsedCart.nota || ''
+    document.getElementById('cot-edit-precio').value   = cot.precio
+    renderEditCotLista()
+
+    document.getElementById('cot-edit-drawer').classList.add('visible')
+    document.getElementById('cot-edit-backdrop').classList.add('visible')
+  }
+
+  function cerrarEditCotizacion() {
+    document.getElementById('cot-edit-drawer').classList.remove('visible')
+    document.getElementById('cot-edit-backdrop').classList.remove('visible')
+    _editCotId = null
+    _editCotItems = []
+  }
+
+  function renderEditCotLista() {
+    const subtotal = _editCotItems.reduce((s, i) => s + i.precio, 0)
+    document.getElementById('cot-edit-subtotal').textContent = fmt(subtotal)
+
+    document.getElementById('cot-edit-lista').innerHTML = _editCotItems.length
+      ? _editCotItems.map((item, idx) => `
+          <div class="carrito-item">
+            <div class="carrito-item-top">
+              <div class="carrito-item-info">
+                <div class="carrito-item-tipo">${escHtml(item.tipoLabel)}</div>
+                <div class="carrito-item-desc">${escHtml(item.desc)}</div>
+              </div>
+              <button class="carrito-item-del" onclick="eliminarItemCotEdit(${idx})">✕</button>
+            </div>
+            <div class="carrito-item-bottom">
+              <span class="carrito-item-precio-label">Precio al cliente</span>
+              <input class="carrito-item-precio-input" type="number" value="${item.precio}" min="0" step="1000"
+                onchange="actualizarPrecioCotEdit(${idx}, this.value)" />
+            </div>
+          </div>`).join('')
+      : '<p style="color:var(--muted);text-align:center;padding:30px 0;">Sin productos</p>'
+  }
+
+  function eliminarItemCotEdit(idx) {
+    _editCotItems.splice(idx, 1)
+    renderEditCotLista()
+  }
+
+  function actualizarPrecioCotEdit(idx, val) {
+    _editCotItems[idx].precio = parseInt(val) || 0
+    const subtotal = _editCotItems.reduce((s, i) => s + i.precio, 0)
+    document.getElementById('cot-edit-subtotal').textContent = fmt(subtotal)
+    const inp = document.getElementById('cot-edit-precio')
+    if (!inp.dataset.editado) inp.value = subtotal
+  }
+
+  async function guardarEdicionCotizacion() {
+    if (!_editCotId) return
+    const nota     = document.getElementById('cot-edit-nota').value.trim()
+    const precio   = parseInt(document.getElementById('cot-edit-precio').value) || 0
+    const newDesc  = JSON.stringify({ items: _editCotItems, nota })
+    const { error } = await sb.from('Cotizacion')
+      .update({ descripcion: newDesc, precio })
+      .eq('id', _editCotId)
+    if (error) { alert('Error al guardar: ' + error.message); return }
+    cerrarEditCotizacion()
+    renderCotizaciones()
   }
 
   async function eliminarCotizacion(id) {
@@ -1086,15 +1291,56 @@
       const idxActivo = ESTADOS.indexOf(p.estado)
       const fecha     = fmtFecha(p.fechaPedido)
 
-      const steps = ESTADOS.map((e, i) => {
-        const cls = i < idxActivo ? 'done' : i === idxActivo ? 'active' : ''
-        const dot = i < idxActivo ? '✓'   : i === idxActivo ? '●'      : ''
-        return `
-          <div class="step-item ${cls}" onclick="actualizarEstado(${p.id},'${escAttr(e)}')" title="${e}">
-            <div class="step-dot">${dot}</div>
-            <div class="step-label">${e}</div>
+      // Detectar si es pedido de carrito con items JSON
+      let parsedPedCart = null
+      if (p.tipo === 'carrito' && p.descripcion) {
+        try {
+          const parsed = JSON.parse(p.descripcion)
+          if (Array.isArray(parsed.items)) parsedPedCart = parsed
+        } catch {}
+      }
+
+      // Descripción visible: si es carrito parseado, mostrar resumen legible
+      let descHtmlPed = ''
+      if (parsedPedCart) {
+        const n = parsedPedCart.items.length
+        descHtmlPed = `<div class="cot-desc cot-desc-items">${n} producto${n !== 1 ? 's' : ''} · ${parsedPedCart.items.map(i => i.tipoLabel).join(', ')}</div>`
+      } else if (p.descripcion) {
+        descHtmlPed = `<div class="cot-desc">${escHtml(p.descripcion)}</div>`
+      }
+
+      // Sección inferior: barra de progreso para carrito, stepper para producto único
+      let bottomSection
+      if (parsedPedCart) {
+        const items       = parsedPedCart.items
+        const terminados  = items.filter(i => i.pedidoEstado === 'Terminado').length
+        const total       = items.length
+        const pct         = total ? Math.round(terminados / total * 100) : 0
+        bottomSection = `
+          <div class="pedido-progreso">
+            <div class="pedido-progreso-header">
+              <span class="pedido-progreso-text">${terminados}/${total} producto${total !== 1 ? 's' : ''} listo${terminados !== 1 ? 's' : ''}</span>
+              <button class="pedido-btn-prod" onclick="verDetallePedido(${p.id})">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                Ver producción
+              </button>
+            </div>
+            <div class="pedido-progreso-bar" id="progreso-bar-${p.id}">
+              <div class="pedido-progreso-fill" style="width:${pct}%"></div>
+            </div>
           </div>`
-      }).join('')
+      } else {
+        const steps = ESTADOS.map((e, i) => {
+          const cls = i < idxActivo ? 'done' : i === idxActivo ? 'active' : ''
+          const dot = i < idxActivo ? '✓'   : i === idxActivo ? '●'      : ''
+          return `
+            <div class="step-item ${cls}" onclick="actualizarEstado(${p.id},'${escAttr(e)}')" title="${e}">
+              <div class="step-dot">${dot}</div>
+              <div class="step-label">${e}</div>
+            </div>`
+        }).join('')
+        bottomSection = `<div class="pedido-stepper"><div class="stepper-track">${steps}</div></div>`
+      }
 
       return `
         <div class="pedido-card" id="ped-${p.id}">
@@ -1109,8 +1355,8 @@
                 <span class="cot-fecha">${fecha}</span>
               </div>
               <div class="cot-cliente">${escHtml(p.cliente)}</div>
-              ${p.contacto    ? `<div class="cot-contacto">📱 ${escHtml(p.contacto)}</div>` : ''}
-              ${p.descripcion ? `<div class="cot-desc">${escHtml(p.descripcion)}</div>`     : ''}
+              ${p.contacto ? `<div class="cot-contacto">📱 ${escHtml(p.contacto)}</div>` : ''}
+              ${descHtmlPed}
               <div class="cot-precio">${fmt(p.precio)}</div>
               <div class="pedido-actions">
                 ${p.contacto ? `
@@ -1125,9 +1371,7 @@
               </div>
             </div>
           </div>
-          <div class="pedido-stepper">
-            <div class="stepper-track">${steps}</div>
-          </div>
+          ${bottomSection}
         </div>`
     }).join('')
   }
@@ -1135,6 +1379,68 @@
   async function actualizarEstado(pedidoId, nuevoEstado) {
     await sb.from('Pedido').update({ estado: nuevoEstado }).eq('id', pedidoId)
     renderPedidos()
+  }
+
+  // ── Detalle de producción por producto ─────────────
+  function verDetallePedido(pedidoId) {
+    renderDetallePedidoModal(pedidoId)
+    document.getElementById('modal-detalle-pedido').classList.add('visible')
+  }
+
+  function cerrarDetallePedido() {
+    document.getElementById('modal-detalle-pedido').classList.remove('visible')
+  }
+
+  function renderDetallePedidoModal(pedidoId) {
+    const pedido = _pedidosData.find(p => p.id === pedidoId)
+    if (!pedido) return
+    let parsedCart
+    try { parsedCart = JSON.parse(pedido.descripcion) } catch { return }
+    if (!Array.isArray(parsedCart.items)) return
+
+    document.getElementById('detalle-ped-cliente').textContent = pedido.cliente || 'Sin nombre'
+
+    const PROD_ESTADOS = ['Pendiente', 'En fabricación', 'Terminado']
+    document.getElementById('detalle-ped-lista').innerHTML = parsedCart.items.map((item, idx) => {
+      const estadoItem = item.pedidoEstado || 'Pendiente'
+      return `
+        <div class="prod-item" id="prod-item-${pedidoId}-${idx}">
+          <div class="prod-item-header">
+            <div class="detalle-item-tipo">${escHtml(item.tipoLabel)}</div>
+            <div class="detalle-item-desc">${escHtml(item.desc)}</div>
+          </div>
+          <div class="prod-estado-btns">
+            ${PROD_ESTADOS.map(e => `
+              <button class="prod-estado-btn ${estadoItem === e ? 'active estado-' + e.split(' ')[0].toLowerCase() : ''}"
+                onclick="actualizarEstadoItemPedido(${pedidoId}, ${idx}, '${e}')">
+                ${e}
+              </button>`).join('')}
+          </div>
+        </div>`
+    }).join('')
+  }
+
+  async function actualizarEstadoItemPedido(pedidoId, itemIndex, nuevoEstado) {
+    const pedido = _pedidosData.find(p => p.id === pedidoId)
+    if (!pedido) return
+    const parsedCart = JSON.parse(pedido.descripcion)
+    parsedCart.items[itemIndex].pedidoEstado = nuevoEstado
+    const newDesc = JSON.stringify(parsedCart)
+    await sb.from('Pedido').update({ descripcion: newDesc }).eq('id', pedidoId)
+    pedido.descripcion = newDesc
+
+    // Actualizar barra de progreso en la tarjeta
+    const items      = parsedCart.items
+    const terminados = items.filter(i => i.pedidoEstado === 'Terminado').length
+    const total      = items.length
+    const pct        = total ? Math.round(terminados / total * 100) : 0
+    const barEl      = document.getElementById(`progreso-bar-${pedidoId}`)
+    if (barEl) barEl.querySelector('.pedido-progreso-fill').style.width = pct + '%'
+    const textEl = barEl?.closest('.pedido-progreso')?.querySelector('.pedido-progreso-text')
+    if (textEl) textEl.textContent = `${terminados}/${total} producto${total !== 1 ? 's' : ''} listo${terminados !== 1 ? 's' : ''}`
+
+    // Re-renderizar el modal
+    renderDetallePedidoModal(pedidoId)
   }
 
   async function eliminarPedido(id) {
